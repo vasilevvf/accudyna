@@ -12,7 +12,9 @@ namespace ServerConsole
     /// <summary>
     /// Сервер отправляет 10 запросов "query" клиенту.
     /// Клиент отвечает ему "answerQuery".       
-    /// Источник: https://metanit.com/sharp/net/5.3.php
+    /// Источники: 
+    /// 1. https://metanit.com/sharp/net/5.3.php
+    /// 2. https://gist.github.com/oleksabor/5f9240d07ac0d66251325e45275c20db
     /// </summary>
     internal class Server
     {       
@@ -40,9 +42,10 @@ namespace ServerConsole
             remotePort = 4004;  
 
             //var tcpListener = new TcpListener(IPAddress.Any, 8888);
-            using (Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            using (Socket sender = new Socket(
+                AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
-                // запускаем получение сообщений по адресу 127.0.0.1:localPort
+                // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
                 sender.Bind(new IPEndPoint(localAddress, localPort));
 
                 // Определяю данные для отправки - строка "query".
@@ -61,19 +64,22 @@ namespace ServerConsole
             byte[] data = Encoding.UTF8.GetBytes(dataString);
 
             // Отправляю данные.
-            sender.SendTo(data, new IPEndPoint(localAddress, remotePort));
+            sender.SendToAsync(new ArraySegment<byte>(data), 
+                SocketFlags.None, new IPEndPoint(localAddress, remotePort));
+            
             Console.WriteLine($"Клиенту: {dataString}");
 
             Thread.Sleep(1500);
 
             // Буфер для получения данных.
             byte[] responseData = new byte[64];
+            ArraySegment<byte> responseDataSegment = new ArraySegment<byte>(responseData);
 
-            /// ReadAsync() означает неблокирующую поток функцию. Аналог
-            /// SerialPort.Read() для RS-232. То есть ReadAsync() считывает
+            /// ReceiveFromAsync() означает неблокирующую поток функцию. Аналог
+            /// SerialPort.Read() для RS-232. То есть ReceiveFromAsync() считывает
             /// из буфера указанное количество байтов и передаёт 
             /// управление коду в исходном потоке. 
-            /// Функция Read() блокирует основной поток и дожидается
+            /// Функция Receive() блокирует основной поток и дожидается
             /// появления в буфере байтов. Потом считывает их и 
             /// передаёт управление коду основного потока.
             /// Так как сервер постоянно опрашивает клиента, нужно
@@ -81,19 +87,21 @@ namespace ServerConsole
             /// какой либо причине не обработает запрос, сервер
             /// повиснет в ожидании ответа.
             //Task<int> task = sender.ReceiveAsync(responseData, 0, responseData.Length);
-            Task<SocketReceiveFromResult> task = sender.ReceiveFromAsync(data, SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
+            sender.ReceiveFromAsync(responseDataSegment, 
+                SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
 
             /// Количество считанных байтов.
             /// Так:
             /// int readBytesCount = task.Result;
-            /// не работает. Делает stream.ReadAsync()
+            /// не работает. Делает sender.ReceiveFromAsync()
             /// синхронной. 
 
+            responseData = responseDataSegment.ToArray();
             string response = Encoding.UTF8.GetString(responseData, 0, responseData.Length);
             Array.Clear(responseData, 0, responseData.Length);
 
             // Вывожу отправленные клиентом данные.
             Console.WriteLine($"От клиента: {response}");
-        }
+        }        
     }
 }
