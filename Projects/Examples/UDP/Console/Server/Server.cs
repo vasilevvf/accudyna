@@ -33,20 +33,28 @@ namespace ServerConsole
     class MyServer
     {
         static IPAddress localAddress;
-        static int localPort;
-        static int remotePort;
+
+        /// <summary>
+        /// 
+        ///                        4004
+        ///        sendPort ----------------> receivePort 
+        ///       /                                      \
+        /// Server                                        Client
+        ///       \                4005                  /
+        ///        receivePort <---------------- sendPort
+        ///        
+        /// </summary>       
+        const int sendPort = 4004;     // Для отправки.
+        const int receivePort = 4005;  // Для приёма.
 
         public static void Start()
         {
-            localAddress = IPAddress.Parse("127.0.0.1");
-            remotePort = 4004;  
-
-            //var tcpListener = new TcpListener(IPAddress.Any, 8888);
+            localAddress = IPAddress.Parse("127.0.0.1");            
             using (Socket sender = new Socket(
                 AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
-                sender.Bind(new IPEndPoint(localAddress, localPort));
+                sender.Bind(new IPEndPoint(localAddress, receivePort));
 
                 // Определяю данные для отправки - строка "query".
                 string dataString = "query";
@@ -61,11 +69,10 @@ namespace ServerConsole
 
         internal static void SendRequestToClient(Socket sender, string dataString)
         {
-            byte[] data = Encoding.UTF8.GetBytes(dataString);
+            byte[] sendData = Encoding.UTF8.GetBytes(dataString);
 
             // Отправляю данные.
-            sender.SendToAsync(new ArraySegment<byte>(data), 
-                SocketFlags.None, new IPEndPoint(localAddress, remotePort));
+            sender.SendTo(sendData, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
             
             Console.WriteLine($"Клиенту: {dataString}");
 
@@ -75,21 +82,28 @@ namespace ServerConsole
             byte[] responseData = new byte[64];
             ArraySegment<byte> responseDataSegment = new ArraySegment<byte>(responseData);
 
-            /// ReceiveFromAsync() означает неблокирующую поток функцию. Аналог
-            /// SerialPort.Read() для RS-232. То есть ReceiveFromAsync() считывает
-            /// из буфера указанное количество байтов и передаёт 
-            /// управление коду в исходном потоке. 
-            /// Функция Receive() блокирует основной поток и дожидается
-            /// появления в буфере байтов. Потом считывает их и 
-            /// передаёт управление коду основного потока.
-            /// Так как сервер постоянно опрашивает клиента, нужно
-            /// использовать ReadAsync(). Так как, если клиент по 
-            /// какой либо причине не обработает запрос, сервер
-            /// повиснет в ожидании ответа.
-            //Task<int> task = sender.ReceiveAsync(responseData, 0, responseData.Length);
-            sender.ReceiveFromAsync(responseDataSegment, 
-                SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
-
+            try
+            {
+                /// ReceiveFromAsync() означает неблокирующую поток функцию. Аналог
+                /// SerialPort.Read() для RS-232. То есть ReceiveFromAsync() считывает
+                /// из буфера указанное количество байтов и передаёт 
+                /// управление коду в исходном потоке. 
+                /// Функция Receive() блокирует основной поток и дожидается
+                /// появления в буфере байтов. Потом считывает их и 
+                /// передаёт управление коду основного потока.
+                /// Так как сервер постоянно опрашивает клиента, нужно
+                /// использовать ReadAsync(). Так как, если клиент по 
+                /// какой либо причине не обработает запрос, сервер
+                /// повиснет в ожидании ответа.            
+                sender.ReceiveFromAsync(responseDataSegment,
+                    SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
+            }
+            catch (SocketException)
+            {
+                Console.WriteLine($"Клиент не подключен.");
+                return;
+            }
+            
             /// Количество считанных байтов.
             /// Так:
             /// int readBytesCount = task.Result;
