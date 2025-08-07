@@ -89,7 +89,7 @@ namespace Server
         {
             header = GetUshortFromString(textBox.Text, out isHeaderFormatError);
             axisID = GetByteFromString(textBox1.Text, out isAxisID_FormatError);
-            commandMode = GetByteFromString(textBox2.Text, out isAxisID_FormatError); ;
+            commandMode = GetByteFromString(textBox2.Text, out isAxisID_FormatError);
             c1 = GetFloatFromString(textBox3.Text, out is_C1_FormatError);
             c2 = GetFloatFromString(textBox4.Text, out is_C2_FormatError);
             c3 = GetFloatFromString(textBox5.Text, out is_C3_FormatError);
@@ -178,7 +178,38 @@ namespace Server
         
         private void CheckCommandInputErrors()
         {
-            
+            if (isHeaderFormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"Header\". Градусы должны быть ushort.");
+            }
+            if (isAxisID_FormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"Axis ID\". Градусы должны быть byte.");
+            }
+            if (isCommandModeFormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"Command Mode\". Градусы должны быть byte.");
+            }
+            if (is_C1_FormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"C1\". Градусы должны быть float.");
+            }
+            if (is_C2_FormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"C2\". Градусы должны быть float.");
+            }
+            if (is_C3_FormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"C3\". Градусы должны быть float.");
+            }
+            if (is_C4_FormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"C4\". Градусы должны быть byte.");
+            }
+            if (isCounterFormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"Counter\". Градусы должны быть byte.");
+            }
         }
 
         private void SendCommand()
@@ -189,18 +220,33 @@ namespace Server
 
         private void UpdatePacket()
         {
-            Packet.Header = 0x8585;
-            Packet.AxisID = axisID;
-            Packet.CommandMode = commandMode;
-            Packet.C2 = c2;
-            Packet.C3 = c3;
-            Packet.C4 = c4;
-            Packet.Counter = counter;            
+            Packet.CommandHeader = 0x8585;
+            Packet.CommandAxisID = axisID;
+            Packet.CommandCommandMode = commandMode;
+            Packet.CommandC2 = c2;
+            Packet.CommandC3 = c3;
+            Packet.CommandC4 = c4;
+            Packet.CommandCounter = counter;            
         }
 
         private void SendCommandRotate()
         {
-            
+            /// Выполнять в отдельном потоке. Иначе GUI может застыть.
+            Task.Run(() =>
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    Packet.IsAnswerCommandReceived = false;
+                    byte[] commandBytes = Packet.GetCommandBytesFromProperties();
+
+                    Conversation.QueryInController(commandBytes);
+
+                    if (Packet.IsAnswerCommandReceived)
+                    {
+                        break;
+                    }
+                }
+            });
         }
 
         #endregion Отправить.
