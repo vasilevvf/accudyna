@@ -69,6 +69,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModelsNS\ConversationNS\UDP\ConversationUDP.cs" />
+    <Compile Include="ModelsNS\ConversationNS\UDP\DataPackets\Packet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -5,54 +5,55 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Server"
         mc:Ignorable="d"
-        Title="Server" Height="450" Width="800">
+        Title="Server" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid Background="#d2d2d2" Margin="0,0,0,-6">
         <StackPanel HorizontalAlignment="Center" Margin="0,21,0,0" Orientation="Vertical" VerticalAlignment="Top">
             <StackPanel Height="99" Width="800">
-                <Label Content="Команда"/>
+                <Label Content="Команда" FontSize="14"/>
                 <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                     <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
+                        <Label Content="Header"/>
+                        <TextBox x:Name="textBox" TextWrapping="Wrap" Text="0x8585"/>
                     </StackPanel>
                     <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
+                        <Label Content="Axis ID"/>
+                        <TextBox x:Name="textBox1" TextWrapping="Wrap" Text="TextBox"/>
+                    </StackPanel>
+                    <StackPanel Height="52" Width="100">
+                        <Label Content="Command Mode"/>
+                        <TextBox x:Name="textBox2" TextWrapping="Wrap" Text="TextBox"/>
                     </StackPanel>
                     <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
+                        <Label Content="C1"/>
+                        <TextBox x:Name="textBox3" TextWrapping="Wrap" Text="TextBox"/>
                     </StackPanel>
                     <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
+                        <Label Content="C2"/>
+                        <TextBox x:Name="textBox4" TextWrapping="Wrap" Text="TextBox"/>
                     </StackPanel>
                     <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
+                        <Label Content="C3"/>
+                        <TextBox x:Name="textBox5" TextWrapping="Wrap" Text="TextBox"/>
                     </StackPanel>
                     <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
+                        <Label Content="C4"/>
+                        <TextBox x:Name="textBox6" TextWrapping="Wrap" Text="TextBox"/>
                     </StackPanel>
                     <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
+                        <Label Content="Reserved"/>
+                        <TextBox x:Name="textBox7" TextWrapping="Wrap" Text="TextBox"/>
                     </StackPanel>
                     <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
+                        <Label Content="Counter"/>
+                        <TextBox x:Name="textBox8" TextWrapping="Wrap" Text="TextBox"/>
                     </StackPanel>
-                    <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
-                    </StackPanel>
-                    <StackPanel Height="52" Width="61">
-                        <Label Content="Label"/>
-                        <TextBox TextWrapping="Wrap" Text="TextBox"/>
+                    <StackPanel Height="52" Width="65">
+                        <Label Content="Checksum"/>
+                        <TextBox x:Name="textBox9" TextWrapping="Wrap" Text="TextBox"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
+            <Button Content="Отправить" Click="Button_Click"/>
             <StackPanel Height="99" Width="800">
                 <Label Content="Ответ на команду"/>
                 <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
