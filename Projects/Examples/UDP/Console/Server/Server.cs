@@ -33,6 +33,8 @@ namespace ServerConsole
     class MyServer
     {
         static IPAddress localAddress;
+        static Socket socket;
+        static int arraySize;
 
         /// <summary>
         /// 
@@ -48,36 +50,55 @@ namespace ServerConsole
         const int receivePort = 4005;  // Для приёма.
 
         public static void Start()
-        {
-            localAddress = IPAddress.Parse("127.0.0.1");            
-            using (Socket sender = new Socket(
-                AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+        {            
+            OpenConnection();
+
+            for (int i = 0; i < 10; i++)
             {
-                // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
-                sender.Bind(new IPEndPoint(localAddress, receivePort));
-
                 // Определяю данные для отправки - строка "query".
-                string dataString = "query";
-
-                for (int i = 0; i < 10; i++)
-                {
-                    SendRequestToClient(sender, dataString);
-                    Thread.Sleep(1000);
-                }
+                //string dataString = "query";
+                int sendData = 0x0A_0B_0C_0D;
+                arraySize = 4;
+                byte[] sendbytes = BitConverter.GetBytes(sendData);
+                SendRequestToClient(sendbytes);
+                Thread.Sleep(1000);
             }
+
+            CloseConnection();
         }
 
-        internal static void SendRequestToClient(Socket sender, string dataString)
+        static void OpenConnection()
         {
-            byte[] sendData = Encoding.UTF8.GetBytes(dataString);
-
-            // Отправляю данные.
-            sender.SendTo(sendData, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
+            localAddress = IPAddress.Parse("127.0.0.1");
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             
-            Console.WriteLine($"Клиенту: {dataString}");
+            // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
+            socket.Bind(new IPEndPoint(localAddress, receivePort));                    
+        }
+
+        internal static void SendRequestToClient(byte[] bytes)
+        {
+            //byte[] sendData = Encoding.UTF8.GetBytes(bytes);          
+
+            WriteBuffer(bytes);
 
             Thread.Sleep(1500);
 
+            ReadBuffer();            
+        }     
+        
+        static void WriteBuffer(byte[] bytes)
+        {
+            // Отправляю данные.
+            //string dataString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+            string dataString = GetPacketString(bytes, arraySize);
+            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));            
+
+            Console.WriteLine($"Клиенту: {dataString}");
+        }        
+
+        static void ReadBuffer()
+        {
             // Буфер для получения данных.
             byte[] responseData = new byte[64];
             ArraySegment<byte> responseDataSegment = new ArraySegment<byte>(responseData);
@@ -95,7 +116,7 @@ namespace ServerConsole
                 /// использовать ReadAsync(). Так как, если клиент по 
                 /// какой либо причине не обработает запрос, сервер
                 /// повиснет в ожидании ответа.            
-                sender.ReceiveFromAsync(responseDataSegment,
+                socket.ReceiveFromAsync(responseDataSegment,
                     SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
             }
             catch (SocketException)
@@ -103,7 +124,7 @@ namespace ServerConsole
                 Console.WriteLine($"Клиент не подключен.");
                 return;
             }
-            
+
             /// Количество считанных байтов.
             /// Так:
             /// int readBytesCount = task.Result;
@@ -111,11 +132,33 @@ namespace ServerConsole
             /// синхронной. 
 
             responseData = responseDataSegment.ToArray();
-            string response = Encoding.UTF8.GetString(responseData, 0, responseData.Length);
+            string responseDataHex = GetPacketString(responseData, arraySize);
+            //string response = Encoding.UTF8.GetString(responseData, 0, responseData.Length);
             Array.Clear(responseData, 0, responseData.Length);
 
             // Вывожу отправленные клиентом данные.
-            Console.WriteLine($"От клиента: {response}");
-        }        
+            Console.WriteLine($"От клиента: {responseDataHex}");
+        }
+
+        static void CloseConnection()
+        {
+            socket.Close();    
+        }
+
+        private static string GetPacketString(byte[] bytes, int arraySize)
+        {
+            string s;
+            string bytesString = "";
+
+            bytesString = string.Format("{0:X2}", bytes[0]);
+            for (int i = 1; i < arraySize; i++)
+            {
+                s = string.Format("-{0:X2}", bytes[i]);
+                bytesString = string.Concat(bytesString, s);
+            }
+
+            return bytesString;
+        }
+
     }
 }
