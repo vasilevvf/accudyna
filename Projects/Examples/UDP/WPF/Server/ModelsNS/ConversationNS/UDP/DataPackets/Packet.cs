@@ -100,16 +100,7 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         {
             get { return commandChecksum; }
             set { commandChecksum = value; }
-        }
-
-        private static bool isAnswerCommandReceived;
-
-        public static bool IsAnswerCommandReceived
-        {
-            get { return isAnswerCommandReceived; }
-            set { isAnswerCommandReceived = value; }
-        }
-
+        }        
 
         #endregion Свойства.
 
@@ -244,7 +235,148 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
 
         #endregion Command.
 
+        #region AnswerCommand.
 
+        #region Свойства.
+
+        private static ushort answerCommandHeader;
+
+        public static ushort AnswerCommandHeader
+        {
+            get { return answerCommandHeader; }
+            set { answerCommandHeader = value; }
+        }
+
+        private static byte answerCommandType;
+
+        public static byte AnswerCommandType
+        {
+            get { return answerCommandType; }
+            set { answerCommandType = value; }
+        }
+
+        private static float answerCommand_f1;
+
+        public static float AanswerCommand_f1
+        {
+            get { return answerCommand_f1; }
+            set { answerCommand_f1 = value; }
+        }
+
+        private static float answerCommand_f2;
+
+        public static float AanswerCommand_f2
+        {
+            get { return answerCommand_f2; }
+            set { answerCommand_f2 = value; }
+        }
+
+        private static float answerCommand_f3;
+
+        public static float AanswerCommand_f3
+        {
+            get { return answerCommand_f3; }
+            set { answerCommand_f3 = value; }
+        }
+
+        private static ushort answerCommandChecksum;
+
+        public static ushort AnswerCommandChecksum
+        {
+            get { return answerCommandChecksum; }
+            set { answerCommandChecksum = value; }
+        }
+
+        private static bool isAnswerCommandReceived;
+
+        public static bool IsAnswerCommandReceived
+        {
+            get { return isAnswerCommandReceived; }
+            set { isAnswerCommandReceived = value; }
+        }
+
+        #endregion Свойства.
+
+        #region Методы.
+
+        /// <summary>
+        /// Получить значения answerQuery свойств из входящих байт.
+        /// </summary>        
+        internal static void SetAnswerCommandBytes(byte[] answerCommandBytes)
+        {
+            // От Игоря идёт порядок: старший байт первый.
+            // Сделать порядок: младший байт первый.
+            // Для правильной работы UnionFromBytes().            
+            //byte[] answerQueryBytesInverseOrder = SwapAnswerQueryBytesByValue(answerQueryBytes);
+
+            // Объединение из массива байт.
+            answerCommandUnion = UnionFromBytes<AnswerCommandUnion>(in answerCommandBytes);
+
+            // Из принятого пакета установить параметры.                
+            answerCommandHeader = answerCommandUnion.header;
+            answerCommandType = answerCommandUnion.type;
+            answerCommand_f1 = answerCommandUnion.f1;
+            answerCommand_f2 = answerCommandUnion.f2;
+            answerCommand_f3 = answerCommandUnion.f3;
+            answerCommandChecksum = answerCommandUnion.cheksum;
+
+            isAnswerCommandReceived = true;            
+        }
+
+        /// <summary>
+        /// Формирует объединение из массива байт.
+        /// </summary>      
+        internal static T UnionFromBytes<T>(in byte[] bytes)
+        {
+            byte[] bytes1 = bytes;
+            int len = Marshal.SizeOf(typeof(T));
+
+            // Бронирует блок памяти в неуправляемой памяти
+            IntPtr ptr = Marshal.AllocHGlobal(len);
+
+            // Копирует управляемый bytes в 
+            // неуправляемый ptr            
+            if (bytes1.Length < len)
+            {
+                bytes1 = new byte[len];
+            }
+            Marshal.Copy(bytes1, 0, ptr, len);
+
+            // Перемещает побайтно неуправляемый ptr 
+            // в управляемый пустой object. 
+            // Затем приводит к типу T.
+            T u = (T)Marshal.PtrToStructure(ptr, typeof(T));
+
+            Marshal.FreeHGlobal(ptr);
+            return u;
+        }
+
+        #endregion Методы.
+
+        #region Объединение.
+
+        [StructLayout(LayoutKind.Explicit, Size = 17)]
+        internal struct AnswerCommandUnion
+        {
+            [FieldOffset(0)]
+            public ushort header;
+            [FieldOffset(2)]
+            public byte type;
+            [FieldOffset(3)]
+            public float f1;
+            [FieldOffset(7)]
+            public float f2;
+            [FieldOffset(11)]
+            public float f3;
+            [FieldOffset(15)]
+            public ushort cheksum;            
+        }
+
+        private static AnswerCommandUnion answerCommandUnion;
+
+        #endregion Объединение.
+
+        #endregion AnswerCommand.
 
     }
 }
