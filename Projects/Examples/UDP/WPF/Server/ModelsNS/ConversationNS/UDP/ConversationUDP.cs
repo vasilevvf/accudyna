@@ -65,10 +65,10 @@ namespace Server.ModelsNS.ConversationNS.UDP
         {
             // Отправляю данные.
             //string dataString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-            string dataString = GetPacketString(bytes, arraySize);
+            //string dataString = GetPacketString(bytes, arraySize);
             socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
 
-            Console.WriteLine($"Клиенту: {dataString}");
+            //Console.WriteLine($"Клиенту: {dataString}");
         }
        
         static void ReadBuffer()
@@ -139,6 +139,8 @@ namespace Server.ModelsNS.ConversationNS.UDP
 
             return bytesString;
         }
+
+        
         
         #endregion Вспомогательные методы.        
 

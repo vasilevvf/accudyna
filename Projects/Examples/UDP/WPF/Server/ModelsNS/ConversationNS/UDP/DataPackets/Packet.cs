@@ -247,12 +247,34 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             set { answerCommandHeader = value; }
         }
 
+        private static string answerCommandHeaderString;
+
+        public static string AnswerCommandHeaderString
+        {
+            get 
+            {             
+                return GetAnswerCommandHeaderString();
+            }
+            set { answerCommandHeaderString = value; }
+        }
+
         private static byte answerCommandType;
 
         public static byte AnswerCommandType
         {
             get { return answerCommandType; }
             set { answerCommandType = value; }
+        }
+
+        private static string answerCommandTypeString;
+
+        public static string AnswerCommandTypeString
+        {
+            get
+            {
+                return GetAnswerCommandTypeString();
+            }
+            set { answerCommandTypeString = value; }
         }
 
         private static float answerCommand_f1;
@@ -263,12 +285,34 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             set { answerCommand_f1 = value; }
         }
 
+        private static string answerCommand_f1_String;
+
+        public static string AnswerCommand_f1_String
+        {
+            get
+            {
+                return GetAnswerCommand_f1_String();
+            }
+            set { answerCommand_f1_String = value; }
+        }
+
         private static float answerCommand_f2;
 
         public static float AanswerCommand_f2
         {
             get { return answerCommand_f2; }
             set { answerCommand_f2 = value; }
+        }
+
+        private static string answerCommand_f2_String;
+
+        public static string AnswerCommand_f2_String
+        {
+            get
+            {
+                return GetAnswerCommand_f2_String();
+            }
+            set { answerCommand_f2_String = value; }
         }
 
         private static float answerCommand_f3;
@@ -279,12 +323,34 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             set { answerCommand_f3 = value; }
         }
 
+        private static string answerCommand_f3_String;
+
+        public static string AnswerCommand_f3_String
+        {
+            get
+            {
+                return GetAnswerCommand_f3_String();
+            }
+            set { answerCommand_f3_String = value; }
+        }
+
         private static ushort answerCommandChecksum;
 
         public static ushort AnswerCommandChecksum
         {
             get { return answerCommandChecksum; }
             set { answerCommandChecksum = value; }
+        }
+
+        private static string answerCommandChecksumString;
+
+        public static string AnswerCommandChecksumString
+        {
+            get
+            {
+                return GetAnswerCommandChecksumString();
+            }
+            set { answerCommandChecksumString = value; }
         }
 
         private static bool isAnswerCommandReceived;
@@ -349,6 +415,55 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
 
             Marshal.FreeHGlobal(ptr);
             return u;
+        }
+
+        static string GetAnswerCommandHeaderString()
+        {
+            string str = answerCommandHeader.ToString();
+            string hex = string.Format("{0:X2}h", str);
+            return hex;
+        }
+
+        static string GetAnswerCommandTypeString()
+        {
+            string str = answerCommandType.ToString();
+            string hex = string.Format("{0:X2}h", str);
+            return hex;
+        }
+
+        static string GetAnswerCommand_f1_String()
+        {            
+            string hexString = GetStringFromFloat(answerCommand_f1);
+            return hexString;
+        }        
+
+        static string GetAnswerCommand_f2_String()
+        {
+            string hexString = GetStringFromFloat(answerCommand_f2);
+            return hexString;
+        }
+
+        static string GetAnswerCommand_f3_String()
+        {
+            string hexString = GetStringFromFloat(answerCommand_f3);
+            return hexString;
+        }
+        static string GetStringFromFloat(float floatValue)
+        {
+            // Получить массив байтов.
+            byte[] valueBytes = BitConverter.GetBytes(floatValue);
+
+            // Инвертировать порядок байтов в массиве.
+            Array.Reverse(valueBytes);
+
+            // Преобразовать байты в строку байтов.
+            string valueHexString = BitConverter.ToString(valueBytes);
+            return valueHexString;
+        }
+
+        static string GetAnswerCommandChecksumString()
+        {
+            return "";
         }
 
         #endregion Методы.

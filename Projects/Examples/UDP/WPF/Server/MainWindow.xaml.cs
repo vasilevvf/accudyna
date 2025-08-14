@@ -1,4 +1,5 @@
-﻿using Server.ModelsNS.ConversationNS.UDP.DataPackets;
+﻿using Server.ModelsNS.ConversationNS.UDP;
+using Server.ModelsNS.ConversationNS.UDP.DataPackets;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -83,19 +84,20 @@ namespace Server
         public void UpdateGUIMethod()
         {
             UpdatePacketPropertiesFromGUI();
-        }
+            UpdatePacketPropertiesOnGUI();
+        }        
 
         private void UpdatePacketPropertiesFromGUI()
         {
-            header = GetUshortFromString(textBox.Text, out isHeaderFormatError);
-            axisID = GetByteFromString(textBox1.Text, out isAxisID_FormatError);
-            commandMode = GetByteFromString(textBox2.Text, out isAxisID_FormatError);
-            c1 = GetFloatFromString(textBox3.Text, out is_C1_FormatError);
-            c2 = GetFloatFromString(textBox4.Text, out is_C2_FormatError);
-            c3 = GetFloatFromString(textBox5.Text, out is_C3_FormatError);
-            c4 = GetByteFromString(textBox6.Text, out is_C4_FormatError);
-            reserved = 0;
-            counter = GetByteFromString(textBox7.Text, out is_C4_FormatError);
+            commandHeader = GetUshortFromString(textBox.Text, out isHeaderFormatError);
+            commandAxisID = GetByteFromString(textBox1.Text, out isAxisID_FormatError);
+            commandCommandMode = GetByteFromString(textBox2.Text, out isAxisID_FormatError);
+            command_c1 = GetFloatFromString(textBox3.Text, out is_C1_FormatError);
+            command_c2 = GetFloatFromString(textBox4.Text, out is_C2_FormatError);
+            command_c3 = GetFloatFromString(textBox5.Text, out is_C3_FormatError);
+            command_c4 = GetByteFromString(textBox6.Text, out is_C4_FormatError);
+            commandReserved = 0;
+            commandCounter = GetByteFromString(textBox7.Text, out is_C4_FormatError);
         }        
 
         static byte GetByteFromString(string str, out bool isFormatError)
@@ -160,7 +162,12 @@ namespace Server
                 isFormatError = true;
                 return 0;
             }
-        }        
+        }
+
+        private void UpdatePacketPropertiesOnGUI()
+        {
+            textBox10.Text = Packet.AnswerCommandHeaderString;
+        }
 
         #endregion Таймер обновления GUI.                                           
 
@@ -173,6 +180,7 @@ namespace Server
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             CheckCommandInputErrors();
+            UpdatePacket();
             SendCommand();
         }
         
@@ -212,24 +220,18 @@ namespace Server
             }
         }
 
-        private void SendCommand()
-        {
-            UpdatePacket();
-            SendCommandRotate();
-        }
-
         private void UpdatePacket()
         {
             Packet.CommandHeader = 0x8585;
-            Packet.CommandAxisID = axisID;
-            Packet.CommandCommandMode = commandMode;
-            Packet.CommandC2 = c2;
-            Packet.CommandC3 = c3;
-            Packet.CommandC4 = c4;
-            Packet.CommandCounter = counter;            
-        }
+            Packet.CommandAxisID = commandAxisID;
+            Packet.CommandCommandMode = commandCommandMode;
+            Packet.CommandC2 = command_c2;
+            Packet.CommandC3 = command_c3;
+            Packet.CommandC4 = command_c4;
+            Packet.CommandCounter = commandCounter;
+        }                
 
-        private void SendCommandRotate()
+        private void SendCommand()
         {
             /// Выполнять в отдельном потоке. Иначе GUI может застыть.
             Task.Run(() =>
@@ -239,7 +241,7 @@ namespace Server
                     Packet.IsAnswerCommandReceived = false;
                     byte[] commandBytes = Packet.GetCommandBytesFromProperties();
 
-                    Conversation.QueryInController(commandBytes);
+                    ConversationUDP.SendRequestToClient(commandBytes);
 
                     if (Packet.IsAnswerCommandReceived)
                     {
@@ -257,84 +259,84 @@ namespace Server
 
         #region Свойства.
 
-        private static ushort header;
+        private static ushort commandHeader;
 
-        public static ushort Header
+        public static ushort CommandHeader
         {
-            get { return header; }
-            set { header = value; }
+            get { return commandHeader; }
+            set { commandHeader = value; }
         }
 
-        private byte axisID;
+        private byte commandAxisID;
 
-        public byte AxisID
+        public byte CommandAxisID
         {
-            get { return axisID; }
-            set { axisID = value; }
+            get { return commandAxisID; }
+            set { commandAxisID = value; }
         }
 
-        private byte commandMode;
+        private byte commandCommandMode;
 
-        public byte CommandMode
+        public byte CommandCommandMode
         {
-            get { return commandMode; }
-            set { commandMode = value; }
+            get { return commandCommandMode; }
+            set { commandCommandMode = value; }
         }
 
-        private float c1;
+        private float command_c1;
 
-        public float C1
+        public float Command_C1
         {
-            get { return c1; }
-            set { c1 = value; }
+            get { return command_c1; }
+            set { command_c1 = value; }
         }
 
-        private float c2;
+        private float command_c2;
 
-        public float C2
+        public float Command_C2
         {
-            get { return c2; }
-            set { c2 = value; }
+            get { return command_c2; }
+            set { command_c2 = value; }
         }
 
-        private float c3;
+        private float command_c3;
 
-        public float C3
+        public float Command_C3
         {
-            get { return c3; }
-            set { c3 = value; }
+            get { return command_c3; }
+            set { command_c3 = value; }
         }
 
-        private byte c4;
+        private byte command_c4;
 
-        public byte C4
+        public byte Command_C4
         {
-            get { return c4; }
-            set { c4 = value; }
+            get { return command_c4; }
+            set { command_c4 = value; }
         }
 
-        private ushort reserved;
+        private ushort commandReserved;
 
-        public ushort Reserved
+        public ushort CommandReserved
         {
-            get { return reserved; }
-            set { reserved = value; }
+            get { return commandReserved; }
+            set { commandReserved = value; }
         }
 
-        private byte counter;
+        private byte commandCounter;
 
-        public byte Counter
+        public byte CommandCounter
         {
-            get { return counter; }
-            set { counter = value; }
+            get { return commandCounter; }
+            set { commandCounter = value; }
         }
 
-        private ushort checksum;
+        private ushort commandChecksum;
 
-        public ushort Checksum
+        public ushort CommandChecksum
         {
-            get { return checksum; }
-            set { checksum = value; }
+            get { return commandChecksum; }
+            set { commandChecksum = value; }
         }
 
         private bool isHeaderFormatError;
