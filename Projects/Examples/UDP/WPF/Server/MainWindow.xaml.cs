@@ -167,6 +167,12 @@ namespace Server
         private void UpdatePacketPropertiesOnGUI()
         {
             textBox10.Text = Packet.AnswerCommandHeaderString;
+            textBox11.Text = Packet.AnswerCommandTypeString;
+            textBox12.Text = Packet.AnswerCommand_f1_String;
+            textBox13.Text = Packet.AnswerCommand_f2_String;
+            textBox14.Text = Packet.AnswerCommand_f3_String;
+            textBox15.Text = Packet.AnswerCommandChecksumString;
+
         }
 
         #endregion Таймер обновления GUI.                                           

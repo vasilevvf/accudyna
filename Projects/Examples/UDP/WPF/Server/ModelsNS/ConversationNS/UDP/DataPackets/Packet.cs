@@ -418,16 +418,14 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         }
 
         static string GetAnswerCommandHeaderString()
-        {
-            string str = answerCommandHeader.ToString();
-            string hex = string.Format("{0:X2}h", str);
+        {            
+            string hex = string.Format("{0:X2}", answerCommandHeader);
             return hex;
         }
 
         static string GetAnswerCommandTypeString()
-        {
-            string str = answerCommandType.ToString();
-            string hex = string.Format("{0:X2}h", str);
+        {            
+            string hex = string.Format("{0:X2}", answerCommandType);
             return hex;
         }
 
@@ -447,6 +445,12 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         {
             string hexString = GetStringFromFloat(answerCommand_f3);
             return hexString;
+        }        
+
+        static string GetAnswerCommandChecksumString()
+        {            
+            string hex = string.Format("{0:X2}", answerCommandChecksum);
+            return hex;            
         }
         static string GetStringFromFloat(float floatValue)
         {
@@ -459,11 +463,6 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             // Преобразовать байты в строку байтов.
             string valueHexString = BitConverter.ToString(valueBytes);
             return valueHexString;
-        }
-
-        static string GetAnswerCommandChecksumString()
-        {
-            return "";
         }
 
         #endregion Методы.
