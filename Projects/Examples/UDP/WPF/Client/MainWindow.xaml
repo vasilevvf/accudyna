@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Client" Height="281" Width="699">
-    <Grid Background="#d2d2d2" Margin="0,0,0,-6">
+        Title="Client" Height="264" Width="699">
+    <Grid Background="#d2d2d2" Margin="0,0,0,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="657*"/>
             <ColumnDefinition Width="23*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel HorizontalAlignment="Left" Margin="0,21,0,0" Orientation="Vertical" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="218" Width="680">
-            <Border Height="119" BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
+        <StackPanel HorizontalAlignment="Stretch" Margin="0,21,0,0" Orientation="Vertical" VerticalAlignment="Stretch" Grid.ColumnSpan="2">
+            <Border BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
                 <Grid Width="678">
                     <StackPanel>
                         <Label Content="Команда" FontSize="14"/>
@@ -59,12 +59,20 @@
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
-                    <Button Content="Отправить" Click="Button_Click" Margin="0,90,25,0"/>
                 </Grid>
             </Border>
-            <Border BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
-                <StackPanel>
-                    <Label Content="Ответ на команду" FontSize="14"/>
+            <Border BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" Height="131">
+                <StackPanel Margin="0,0,0,-2">
+                    <Label Content="Ответ на команду" FontWeight="Normal" FontSize="14">
+                        <Label.RenderTransform>
+                            <TransformGroup>
+                                <ScaleTransform/>
+                                <SkewTransform AngleX="1.129"/>
+                                <RotateTransform/>
+                                <TranslateTransform X="1.202"/>
+                            </TransformGroup>
+                        </Label.RenderTransform>
+                    </Label>
                     <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                         <StackPanel Height="52" Width="61">
                             <Label Content="Header"/>
@@ -92,6 +100,7 @@
                         </StackPanel>
 
                     </StackPanel>
+                    <Button Content="Отправить" Click="Button_Click" Height="26" Width="652" HorizontalAlignment="Left"/>
                 </StackPanel>
 
             </Border>

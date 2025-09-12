@@ -20,9 +20,28 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Конструктор.
+
         public MainWindow()
         {
             InitializeComponent();
         }
+
+        #endregion Конструктор.
+
+        #region События.
+
+        #region Кнопки.
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        #endregion Кнопки.
+
+        #endregion События.
+
+
     }
 }
