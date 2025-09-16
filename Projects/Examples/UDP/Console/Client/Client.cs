@@ -102,7 +102,7 @@ namespace ClientConsole
                 /// можно использовать Receive(). Можно использовать и 
                 /// ReceiveAsync(), но Receive() проще для восприятия.
                 /// Receive() запускается в выделенном потоке и while(true).
-                /// ReadAsync() запускается в таймере.
+                /// ReceiveAsync() запускается в таймере.
                 int readBytesCount = socket.Receive(responseData, SocketFlags.None);
 
                 // Получаю строку "query".
