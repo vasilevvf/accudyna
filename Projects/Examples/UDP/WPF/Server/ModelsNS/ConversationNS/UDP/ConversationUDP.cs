@@ -106,7 +106,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
             /// синхронной. 
 
             responseData = responseDataSegment.ToArray();
-            Packet.SetAnswerCommandBytes(responseData);
+            Packet.SetAnswerCommandProperties(responseData);
 
             //string responseDataHex = GetPacketString(responseData, arraySize);
             ////string response = Encoding.UTF8.GetString(responseData, 0, responseData.Length);

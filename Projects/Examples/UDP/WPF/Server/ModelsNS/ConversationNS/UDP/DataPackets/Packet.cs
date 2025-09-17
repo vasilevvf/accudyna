@@ -368,13 +368,8 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         /// <summary>
         /// Получить значения answerQuery свойств из входящих байт.
         /// </summary>        
-        internal static void SetAnswerCommandBytes(byte[] answerCommandBytes)
-        {
-            // От Игоря идёт порядок: старший байт первый.
-            // Сделать порядок: младший байт первый.
-            // Для правильной работы UnionFromBytes().            
-            //byte[] answerQueryBytesInverseOrder = SwapAnswerQueryBytesByValue(answerQueryBytes);
-
+        internal static void SetAnswerCommandProperties(byte[] answerCommandBytes)
+        {            
             // Объединение из массива байт.
             answerCommandUnion = UnionFromBytes<AnswerCommandUnion>(in answerCommandBytes);
 
@@ -386,7 +381,7 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             answerCommand_f3 = answerCommandUnion.f3;
             answerCommandChecksum = answerCommandUnion.cheksum;
 
-            isAnswerCommandReceived = true;            
+            isAnswerCommandReceived = true;
         }
 
         /// <summary>
@@ -452,6 +447,7 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             string hex = string.Format("{0:X2}", answerCommandChecksum);
             return hex;            
         }
+
         static string GetStringFromFloat(float floatValue)
         {
             // Получить массив байтов.
