@@ -69,7 +69,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         }
 
         /// <summary>
-        /// Запустить таймер опроса контроллера.
+        /// Запустить таймер запросов сервера.
         /// </summary>
         static void LaunchTimerServerMessage()
         {
@@ -80,8 +80,8 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             timerServerMessage = new Timer(timerServerMessageCallback, null, 0, periodTimerServerMessage);
         }
 
-        static Timer timerServerMessage;            // Таймер сообщений сервера.
-        const int periodTimerServerMessage = 50;    // Период таймера сообщений сервера.                                                        
+        static Timer timerServerMessage;                   // Таймер сообщений сервера.
+        const int periodTimerServerMessage = 50;           // Период таймера сообщений сервера.                                                        
         static TimerCallback timerServerMessageCallback;   // Делегат для типа Timer.        
 
         // Функция обратного вызова для таймера сообщений сервера.
@@ -99,8 +99,8 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             ArraySegment<byte> responseDataSegment = new ArraySegment<byte>(responseData);
 
             /// Получаю данные из потока.
-            /// ReceiveAsync() означает неблокирующую поток функцию. Аналог
-            /// SerialPort.Read() для RS-232. То есть ReceiveAsync() считывает
+            /// ReceiveFromAsync() означает неблокирующую поток функцию. Аналог
+            /// SerialPort.Read() для RS-232. То есть ReceiveFromAsync() считывает
             /// из буфера указанное количество байтов и передаёт 
             /// управление коду в исходном потоке. 
             /// Функция Receive() блокирует основной поток и дожидается
@@ -108,10 +108,17 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             /// передаёт управление коду основного потока.
             /// Клиент всегда отвечает на запросы и команды
             /// сервера, но не посылает запросы серверу. Поэтому 
-            /// можно использовать Receive(). Можно использовать и 
-            /// ReceiveAsync(), но Receive() проще для восприятия.
-            /// Receive() запускается в выделенном потоке и while(true).
+            /// можно использовать Receive(). 
+            /// Receive() запускается в while(true), в выделенном потоке.
             /// ReceiveFromAsync() запускается в таймере.
+            /// В случае завершения программы по событию пользователя,
+            /// возникает вопрос: как выйти из цикла while(true), когда
+            /// функция Receive() запущена и ждёт байты в буфере? Ответ:
+            /// завершать поток в котором запущен этот цикл. Но этот
+            /// метод грубоват. Поэтому лучше использовать Receive().
+            /// Тогда при запросе завершения программы от пользователя, 
+            /// она дождётся завершения функции Receive() и 
+            /// мягко завершит работу.
             socket.ReceiveFromAsync(responseDataSegment,
                     SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
             
@@ -123,7 +130,13 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
                 Packet.SetCommandProperties(responseData);
                 Array.Clear(responseData, 0, arraySize);
             }            
-        }        
+        }
+
+        internal static void WriteBuffer(byte[] bytes)
+        {
+            // Отправляю данные.            
+            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));            
+        }
 
         internal static void StopTimerServerMessage()
         {

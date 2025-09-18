@@ -9,10 +9,20 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
 {
     internal class Packet
     {
+        #region Статический конструктор.
+
+        static Packet()
+        {
+            AnswerCommandChecksumString = "";
+        }
+        
+        #endregion Статический конструктор.
 
         #region Command.
 
         #region Свойства.
+
+        #region Command.
 
         private static ushort commandHeader;
 
@@ -31,7 +41,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
                 return GetCommandHeaderString();
             }
             set { commandHeaderString = value; }
-        }        
+        }
 
         private static byte commandAxisID;
 
@@ -50,7 +60,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
                 return GetCommandAxisID_String();
             }
             set { commandAxisID_String = value; }
-        }        
+        }
 
         private static byte commandCommandMode;
 
@@ -69,7 +79,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
                 return GetCommandCommandModeString();
             }
             set { commandCommandModeString = value; }
-        }        
+        }
 
         private static float command_c1;
 
@@ -88,7 +98,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
                 return GetCommand_c1_String();
             }
             set { command_c1_String = value; }
-        }        
+        }
 
         private static float command_c2;
 
@@ -107,7 +117,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
                 return GetCommand_c2_String();
             }
             set { command_c2_String = value; }
-        }        
+        }
 
         private static float command_c3;
 
@@ -126,7 +136,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
                 return GetCommand_c3_String();
             }
             set { command_c2_String = value; }
-        }        
+        }
 
         private static byte command_c4;
 
@@ -164,7 +174,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
                 return GetCommandReservedString();
             }
             set { commandReservedString = value; }
-        }        
+        }
 
         private static byte commandCounter;
 
@@ -183,7 +193,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
                 return GetCommandCounterString();
             }
             set { commandCounterString = value; }
-        }        
+        }
 
         private static ushort commandChecksum;
 
@@ -212,12 +222,11 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
             set { isCommandReceived = value; }
         }
 
-
+        #endregion Command.
+       
         #endregion Свойства.
 
-        #region Методы.  
-
-        #region Методы свойств.
+        #region Методы.          
 
         private static string GetCommandHeaderString()
         {            
@@ -302,9 +311,40 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
             // Преобразовать байты в строку байтов.
             string valueHexString = BitConverter.ToString(valueBytes);
             return valueHexString;
+        }        
+        
+        #endregion Методы.
+
+        #region Объединение.
+
+        [StructLayout(LayoutKind.Explicit, Size = 22)]
+        internal struct CommandUnion
+        {
+            [FieldOffset(0)]
+            public ushort header;
+            [FieldOffset(2)]
+            public byte axisID;
+            [FieldOffset(3)]
+            public byte commandMode;
+            [FieldOffset(4)]
+            public float c1;
+            [FieldOffset(8)]
+            public float c2;
+            [FieldOffset(12)]
+            public float c3;
+            [FieldOffset(16)]
+            public byte c4;
+            [FieldOffset(17)]
+            public ushort reserved;
+            [FieldOffset(19)]
+            public byte counter;
+            [FieldOffset(20)]
+            public ushort checksum;
         }
 
-        #endregion Методы свойств.
+        #endregion Объединение.
+
+        #endregion Command.
 
         #region Таймер сообщений сервера.
 
@@ -361,40 +401,205 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
 
         #endregion Таймер сообщений сервера.
 
+        #region AnswerCommand.
 
+        #region Свойства.
+
+        private static ushort answerCommandHeader;
+
+        public static ushort AnswerCommandHeader
+        {
+            get { return answerCommandHeader; }
+            set { answerCommandHeader = value; }
+        }
+
+        private static byte answerCommandType;
+
+        public static byte AnswerCommandType
+        {
+            get { return answerCommandType; }
+            set { answerCommandType = value; }
+        }
+
+        private static float answerCommand_f1;
+
+        public static float AnswerCommand_f1
+        {
+            get { return answerCommand_f1; }
+            set { answerCommand_f1 = value; }
+        }
+
+        private static float answerCommand_f2;
+
+        public static float AnswerCommand_f2
+        {
+            get { return answerCommand_f2; }
+            set { answerCommand_f2 = value; }
+        }
+
+        private static float answerCommand_f3;
+
+        public static float AnswerCommand_f3
+        {
+            get { return answerCommand_f3; }
+            set { answerCommand_f3 = value; }
+        }
+
+        private static ushort answerCommandChecksum;
+
+        public static ushort AnswerCommandChecksum
+        {
+            get { return answerCommandChecksum; }
+            set { answerCommandChecksum = value; }
+        }
+
+        private static string answerCommandChecksumString;
+
+        internal static string AnswerCommandChecksumString
+        {
+            get
+            {
+                return GetAnswerCommandChecksumString();
+            }
+            set { answerCommandChecksumString = value; }
+        }
+
+        #endregion Свойства.
+
+        #region Методы.
+
+        #region Методы свойств.
+
+        private static string GetAnswerCommandChecksumString()
+        {
+            string hexString = GetStringFromInt(answerCommandChecksum);
+            return hexString;
+        }
+
+        #endregion Методы свойств.
+
+        #region Основные методы.
+
+        static internal byte[] GetAnswerCommandBytesFromProperties()
+        {
+            AnswerCommandUnion answerCommandUnion = new AnswerCommandUnion();
+
+            /// Перед отправкой команды свойства обновляются.                
+            /// Из переменных сформировать объединение. 
+            answerCommandUnion.header = answerCommandHeader;
+            answerCommandUnion.type = answerCommandType;
+            answerCommandUnion.f1 = answerCommand_f1;
+            answerCommandUnion.f2 = answerCommand_f2;
+            answerCommandUnion.f3 = answerCommand_f3;
+            //answerCommandUnion.cheksum = answerCommandChecksum;            
+
+            // Из объединения сформировать массив байт.
+            byte[] answerCommandBytes = BytesFromUnion(answerCommandUnion);
+
+            // Добавить CRC в хвост массива байт.
+            AddCRC(ref answerCommandBytes);
+            
+            // Обновление конрольной суммы.
+            int bytesCount = answerCommandBytes.Length;
+            answerCommandChecksum = BitConverter.ToUInt16(
+                answerCommandBytes, bytesCount - 2);
+
+            return answerCommandBytes;
+        }
+
+        /// <summary>
+        /// Массив байт из объединения.
+        /// </summary>       
+        internal static byte[] BytesFromUnion<T>(T u)
+        {
+            int size = Marshal.SizeOf(u);
+            byte[] arr = new byte[size];
+
+            // Бронирует блок памяти в неуправляемой памяти.
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+
+            // Перемещает побайтно управляемый str 
+            // в неуправляемой ptr.
+            Marshal.StructureToPtr(u, ptr, true);
+
+            // Копирует неуправляемый ptr в 
+            // управляемый ptr.
+            Marshal.Copy(ptr, arr, 0, size);
+
+            Marshal.FreeHGlobal(ptr);
+            return arr;
+        }
+
+        /// <summary>
+        /// Находит CRC всего массива кроме двух первых и
+        /// двух последних байт. Записывает CRC в два
+        /// последние байта массива.
+        /// </summary>        
+        internal static void AddCRC(ref byte[] bytes)
+        {
+            ushort crc = CalculateCRC(in bytes, (ushort)bytes.Count());
+
+            // Записать CRC в 2 последние байта массива.            
+            // Порядок байт в CRC: старший байт первый.
+            int n = bytes.Count();
+            byte[] crcBytes = BitConverter.GetBytes(crc);
+            bytes[n - 2] = crcBytes[0]; // L.
+            bytes[n - 1] = crcBytes[1]; // H.
+        }
+
+        /// <summary>
+        /// Находит CRC всего массива кроме двух последних байт.
+        /// </summary>        
+        internal static ushort CalculateCRC(in byte[] bytes, ushort len)
+        {
+            // Пример: 
+            // in byte[] bytes;
+            // start = 2; end = 2;
+            // CRC для bytes кроме двух первых
+            // и двух последних байт.
+
+            const byte start = 2;
+            const byte end = 2;
+            ushort crc = 0xFFFF;
+            byte i;
+            byte j = start; // CRC кроме 2 начальных байт.
+
+            while (len-- > start + end) // CRC кроме 2 последних байт.
+            {
+                crc ^= (ushort)(bytes[j++] << 8);
+
+                for (i = 0; i < 8; i++)
+                    crc = (crc & 0x8000) > 0 ? (ushort)(crc << 1 ^ 0x1021) : (ushort)(crc << 1);
+            }
+            return crc;
+        }
+
+        #endregion Основные методы.
 
         #endregion Методы.
 
         #region Объединение.
 
-        [StructLayout(LayoutKind.Explicit, Size = 22)]
-        internal struct CommandUnion
+        [StructLayout(LayoutKind.Explicit, Size = 17)]
+        internal struct AnswerCommandUnion
         {
             [FieldOffset(0)]
             public ushort header;
             [FieldOffset(2)]
-            public byte axisID;
+            public byte type;
             [FieldOffset(3)]
-            public byte commandMode;
-            [FieldOffset(4)]
-            public float c1;
-            [FieldOffset(8)]
-            public float c2;
-            [FieldOffset(12)]
-            public float c3;
-            [FieldOffset(16)]
-            public byte c4;
-            [FieldOffset(17)]
-            public ushort reserved;
-            [FieldOffset(19)]
-            public byte counter;
-            [FieldOffset(20)]
-            public ushort checksum;
-        }       
+            public float f1;
+            [FieldOffset(7)]
+            public float f2;
+            [FieldOffset(11)]
+            public float f3;
+            [FieldOffset(15)]
+            public ushort cheksum;
+        }        
 
         #endregion Объединение.
 
-        #endregion Command.
+        #endregion AnswerCommand.
 
     }
 }

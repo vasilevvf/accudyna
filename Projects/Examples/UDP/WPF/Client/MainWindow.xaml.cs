@@ -1,4 +1,5 @@
-﻿using Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS;
+﻿using Client.ModelsNS.ConversationNS.UDP_NS;
+using Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -34,12 +35,75 @@ namespace Client
 
         #region События.
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            #region Таймер обновления GUI.
+
+            LaunchTimerUpdateGUI();
+
+            #endregion Таймер обновления GUI.
+        }
+
         #region Кнопки.
+
+        #region Отправить.
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            CheckCommandInputErrors();
+            UpdatePacket();
+            SendAnswerCommand();
         }
+
+        private void CheckCommandInputErrors()
+        {
+            if (isAnswerCommandHeaderFormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"Header\". Header должен быть ushort.");
+            }
+            if (isAnswerCommandTypeFormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"Type\". Type должен быть byte.");
+            }
+            if (isAnswerCommand_f1_FormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"f1\". f1 должен быть float.");
+            }
+            if (isAnswerCommand_f2_FormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"f2\". f2 должен быть float.");
+            }
+            if (isAnswerCommand_f3_FormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"f3\". f3 должeн быть float.");
+            }
+            if (isAnswerCommandChecksumFormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"Checksum\". Checksum должна быть ushort.");
+            }            
+        }
+
+        private void UpdatePacket()
+        {
+            Packet.AnswerCommandHeader = answerCommandHeader;
+            Packet.AnswerCommandType = answerCommandType;
+            Packet.AnswerCommand_f1 = answerCommand_f1;
+            Packet.AnswerCommand_f2 = answerCommand_f2;
+            Packet.AnswerCommand_f3 = answerCommand_f3;
+            Packet.AnswerCommandChecksum = answerCommandChecksum;            
+        }
+
+        private void SendAnswerCommand()
+        {
+            /// Выполнять в отдельном потоке. Иначе GUI может застыть.
+            Task.Run(() =>
+            {                
+                byte[] answerCommandBytes = Packet.GetAnswerCommandBytesFromProperties();
+                ConversationUDP.WriteBuffer(answerCommandBytes);
+            });            
+        }
+
+        #endregion Отправить.
 
         #endregion Кнопки.
 
@@ -71,6 +135,23 @@ namespace Client
 
         #endregion Настройки.
 
+        #region Методы.
+
+        /// <summary>
+        /// Запустить таймер обновления графики.
+        /// </summary>
+        internal void LaunchTimerUpdateGUI()
+        {
+            // Делегат для типа Timer.
+            dTimerUpdateGUICallback += new TimerCallback(TimerUpdateGUICallback);
+
+            /// Запустить таймер обновления GUI.
+            timerUpdateGUI = new Timer(dTimerUpdateGUICallback, null, 0, periodTimerUpdateGUI);
+
+            // Делегат для типа Timer.
+            dUpdateGUIMethod += new UpdateGUI(UpdateGUIMethod);
+        }
+
         public void UpdateGUIMethod()
         {
             UpdatePacketPropertiesFromGUI();
@@ -84,7 +165,7 @@ namespace Client
             answerCommand_f1 = GetFloatFromString(textBox12.Text, out isAnswerCommand_f1_FormatError);
             answerCommand_f2 = GetFloatFromString(textBox13.Text, out isAnswerCommand_f1_FormatError);
             answerCommand_f3 = GetFloatFromString(textBox14.Text, out isAnswerCommand_f2_FormatError);
-            answerCommandChecksum = GetUshortFromString(textBox15.Text, out isAnswerCommandChecksumFormatError);            
+            //answerCommandChecksum = GetUshortFromString(textBox15.Text, out isAnswerCommandChecksumFormatError);            
         }
 
         static byte GetByteFromString(string str, out bool isFormatError)
@@ -163,7 +244,12 @@ namespace Client
             textBox7.Text = Packet.CommandReservedString;
             textBox8.Text = Packet.CommandCounterString;
             textBox9.Text = Packet.CommandChecksumString;
+
+            // Обновление конрольной суммы ответа на команду.
+            textBox15.Text = Packet.AnswerCommandChecksumString;
         }
+
+        #endregion Методы.
 
         #endregion Таймер обновления GUI.                                           
 
@@ -171,7 +257,7 @@ namespace Client
 
         #region Command.
 
-              
+
 
         #endregion Command.
 
@@ -211,7 +297,7 @@ namespace Client
 
         private static float answerCommand_f1;
 
-        public static float AanswerCommand_f1
+        public static float AnswerCommand_f1
         {
             get { return answerCommand_f1; }
             set { answerCommand_f1 = value; }
@@ -229,7 +315,7 @@ namespace Client
 
         private static float answerCommand_f2;
 
-        public static float AanswerCommand_f2
+        public static float AnswerCommand_f2
         {
             get { return answerCommand_f2; }
             set { answerCommand_f2 = value; }
@@ -245,7 +331,7 @@ namespace Client
 
         private static float answerCommand_f3;
 
-        public static float AanswerCommand_f3
+        public static float AnswerCommand_f3
         {
             get { return answerCommand_f3; }
             set { answerCommand_f3 = value; }
@@ -283,12 +369,13 @@ namespace Client
             set { isAnswerCommandReceived = value; }
         }
 
+
         #endregion AnswerCommand.        
 
         #endregion Свойства.
 
         #endregion Главное окно.
 
-
+        
     }
 }

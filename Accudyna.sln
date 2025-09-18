@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UshortToHex", "Projects\Exa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Projects\Examples\UDP\WPF\Client\Client.csproj", "{98F2FC5C-D8E6-48C0-95E2-B10E341DF26E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArraySize", "Projects\Examples\Transformations\ArraySize\ArraySize.csproj", "{3A7697E5-A02A-4F2B-9482-7D579D22CF40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,6 +62,10 @@ Global
 		{98F2FC5C-D8E6-48C0-95E2-B10E341DF26E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98F2FC5C-D8E6-48C0-95E2-B10E341DF26E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98F2FC5C-D8E6-48C0-95E2-B10E341DF26E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A7697E5-A02A-4F2B-9482-7D579D22CF40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A7697E5-A02A-4F2B-9482-7D579D22CF40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A7697E5-A02A-4F2B-9482-7D579D22CF40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A7697E5-A02A-4F2B-9482-7D579D22CF40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{3299A2E7-167C-4BF2-8274-9FCEAA53D98E} = {3C53C38B-D98A-4C94-8D36-9C6E367DE176}
 		{1B5719D8-5156-4104-BE00-31553B342017} = {3C53C38B-D98A-4C94-8D36-9C6E367DE176}
 		{98F2FC5C-D8E6-48C0-95E2-B10E341DF26E} = {089BFAD8-C00F-494F-9EF9-9230AE2AE675}
+		{3A7697E5-A02A-4F2B-9482-7D579D22CF40} = {3C53C38B-D98A-4C94-8D36-9C6E367DE176}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5693E5C0-C367-454E-8C29-DA33331F0209}

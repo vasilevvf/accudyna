@@ -14,6 +14,7 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         static Packet()
         {
             commandHeader = 0x8585;
+            CommandChecksumString = "";
         }
 
         #endregion Конструктор.
@@ -100,11 +101,40 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         {
             get { return commandChecksum; }
             set { commandChecksum = value; }
-        }        
+        }
+
+        private static string commandChecksumString;
+
+        internal static string CommandChecksumString
+        {
+            get
+            {
+                return GetCommandChecksumString();
+            }
+            set { commandChecksumString = value; }
+        }
 
         #endregion Свойства.
 
         #region Методы.
+
+        #region Методы свойств.
+
+        private static string GetCommandChecksumString()
+        {
+            string hexString = GetStringFromInt(commandChecksum);
+            return hexString;
+        }
+
+        static string GetStringFromInt(ushort val)
+        {
+            string hex = string.Format("{0:X2}", val);
+            return hex;
+        }
+
+        #endregion Методы свойств.
+
+        #region Основные методы.
 
         static internal byte[] GetCommandBytesFromProperties()
         {
@@ -121,16 +151,18 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             commandUnion.c4 = CommandC4;
             commandUnion.reserved = CommandReserved;
             commandUnion.counter = CommandCounter;
-            commandUnion.checksum = 0x00;            
+            commandUnion.checksum = 0x00;
 
             // Из объединения сформировать массив байт.
-            byte[] commandBytes = BytesFromUnion(commandUnion);
-
-            // Сделать порядок: младший байт первый.
-            //SwapCommandBytesByReference(commandBytes);
+            byte[] commandBytes = BytesFromUnion(commandUnion);           
 
             // Добавить CRC в хвост массива байт.
             AddCRC(ref commandBytes);
+
+            // Обновление конрольной суммы.
+            int bytesCount = commandBytes.Length;
+            CommandChecksum = BitConverter.ToUInt16(
+                commandBytes, bytesCount - 2);    
 
             return commandBytes;
         }
@@ -201,6 +233,10 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             }
             return crc;
         }
+
+        #endregion Основные методы.
+
+
 
         #endregion Методы.
 

@@ -1,21 +1,9 @@
 ﻿using Server.ModelsNS.ConversationNS.UDP;
 using Server.ModelsNS.ConversationNS.UDP.DataPackets;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Server
 {
@@ -38,18 +26,11 @@ namespace Server
         #region Загрузка главного окна.        
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
-        {           
+        {
 
             #region Таймер обновления GUI.
 
-            // Делегат для типа Timer.
-            dTimerUpdateGUICallback += new TimerCallback(TimerUpdateGUICallback);
-
-            /// Запустить таймер обновления GUI.
-            timerUpdateGUI = new Timer(dTimerUpdateGUICallback, null, 0, periodTimerUpdateGUI);
-
-            // Делегат для типа Timer.
-            dUpdateGUIMethod += new UpdateGUI(UpdateGUIMethod);
+            LaunchTimerUpdateGUI();
 
             #endregion Таймер обновления GUI.
 
@@ -81,11 +62,28 @@ namespace Server
 
         #endregion Настройки.
 
+        #region Методы.
+
+        /// <summary>
+        /// Запустить таймер обновления графики.
+        /// </summary>
+        internal void LaunchTimerUpdateGUI()
+        {
+            // Делегат для типа Timer.
+            dTimerUpdateGUICallback += new TimerCallback(TimerUpdateGUICallback);
+
+            /// Запустить таймер обновления GUI.
+            timerUpdateGUI = new Timer(dTimerUpdateGUICallback, null, 0, periodTimerUpdateGUI);
+
+            // Делегат для типа Timer.
+            dUpdateGUIMethod += new UpdateGUI(UpdateGUIMethod);
+        }
+
         public void UpdateGUIMethod()
         {
             UpdatePacketPropertiesFromGUI();
             UpdatePacketPropertiesOnGUI();
-        }        
+        }
 
         private void UpdatePacketPropertiesFromGUI()
         {
@@ -98,7 +96,7 @@ namespace Server
             command_c4 = GetByteFromString(textBox6.Text, out is_C4_FormatError);
             commandReserved = 0;
             commandCounter = GetByteFromString(textBox7.Text, out is_C4_FormatError);
-        }        
+        }
 
         static byte GetByteFromString(string str, out bool isFormatError)
         {
@@ -136,7 +134,7 @@ namespace Server
 
             isFormatError = true;
             return 0;
-        }        
+        }
 
         /// <summary>
         /// Переводит строку string в float.               
@@ -173,7 +171,11 @@ namespace Server
             textBox14.Text = Packet.AnswerCommand_f3_String;
             textBox15.Text = Packet.AnswerCommandChecksumString;
 
+            // Обновление контрольной суммы command.
+            textBox9.Text = Packet.CommandChecksumString;
         }
+
+        #endregion Методы.
 
         #endregion Таймер обновления GUI.                                           
 
@@ -228,7 +230,7 @@ namespace Server
 
         private void UpdatePacket()
         {
-            Packet.CommandHeader = 0x8585;
+            Packet.CommandHeader = commandHeader; // 0x8585.
             Packet.CommandAxisID = commandAxisID;
             Packet.CommandCommandMode = commandCommandMode;
             Packet.CommandC2 = command_c2;

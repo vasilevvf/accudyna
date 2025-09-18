@@ -63,12 +63,8 @@ namespace Server.ModelsNS.ConversationNS.UDP
 
         static void WriteBuffer(byte[] bytes)
         {
-            // Отправляю данные.
-            //string dataString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-            //string dataString = GetPacketString(bytes, arraySize);
-            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
-
-            //Console.WriteLine($"Клиенту: {dataString}");
+            // Отправляю данные.            
+            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));            
         }
        
         static void ReadBuffer()
