@@ -33,7 +33,11 @@ namespace Client
 
         #endregion Конструктор.
 
+        #region Главное окно.
+
         #region События.
+
+        #region Загрузка окна.
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -42,7 +46,25 @@ namespace Client
             LaunchTimerUpdateGUI();
 
             #endregion Таймер обновления GUI.
+
+            ConversationUDP.LaunchTimerServerMessage();
+
+            #region Таймер сообщений сервера.
+
+            #endregion Таймер сообщений сервера.
         }
+
+        #endregion Загрузка окна.
+
+        #region Закрытие окна.
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            ConversationUDP.CloseConnection();
+        }
+
+        #endregion Закрытие окна.
+
 
         #region Кнопки.
 
@@ -80,7 +102,7 @@ namespace Client
             if (isAnswerCommandChecksumFormatError)
             {
                 MessageBox.Show("Ошибка в написании \"Checksum\". Checksum должна быть ushort.");
-            }            
+            }
         }
 
         private void UpdatePacket()
@@ -90,17 +112,16 @@ namespace Client
             Packet.AnswerCommand_f1 = answerCommand_f1;
             Packet.AnswerCommand_f2 = answerCommand_f2;
             Packet.AnswerCommand_f3 = answerCommand_f3;
-            Packet.AnswerCommandChecksum = answerCommandChecksum;            
         }
 
         private void SendAnswerCommand()
         {
             /// Выполнять в отдельном потоке. Иначе GUI может застыть.
             Task.Run(() =>
-            {                
+            {
                 byte[] answerCommandBytes = Packet.GetAnswerCommandBytesFromProperties();
                 ConversationUDP.WriteBuffer(answerCommandBytes);
-            });            
+            });
         }
 
         #endregion Отправить.
@@ -108,8 +129,6 @@ namespace Client
         #endregion Кнопки.
 
         #endregion События.
-
-        #region Главное окно.
 
         #region Таймер обновления GUI.
 
@@ -168,9 +187,24 @@ namespace Client
             //answerCommandChecksum = GetUshortFromString(textBox15.Text, out isAnswerCommandChecksumFormatError);            
         }
 
-        static byte GetByteFromString(string str, out bool isFormatError)
+        static byte GetByteFromString(string hexString, out bool isFormatError)
         {
-            bool isSuccess = byte.TryParse(str, out byte result);
+            isFormatError = false;
+
+            if (hexString == string.Empty)
+            {
+                return 0;
+            }
+
+            // Удалить "0x" в начале.
+            if (hexString.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                hexString = hexString.Substring(2);
+            }
+
+            bool isSuccess = byte.TryParse(hexString,
+                NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo,
+                out byte result);
 
             if (isSuccess)
             {
@@ -185,16 +219,24 @@ namespace Client
         /// <summary>
         /// Получить ushort из string.
         /// </summary>        
-        internal static ushort GetUshortFromString(string str, out bool isFormatError)
+        internal static ushort GetUshortFromString(string hexString, out bool isFormatError)
         {
             isFormatError = false;
 
-            if (str == string.Empty)
+            if (hexString == string.Empty)
             {
                 return 0;
             }
 
-            bool isSuccess = ushort.TryParse(str, out ushort result);
+            // Удалить "0x" в начале.
+            if (hexString.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                hexString = hexString.Substring(2);
+            }
+
+            bool isSuccess = ushort.TryParse(hexString,
+                NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo,
+                out ushort result);
 
             if (isSuccess)
             {
@@ -370,12 +412,13 @@ namespace Client
         }
 
 
+
         #endregion AnswerCommand.        
 
         #endregion Свойства.
 
         #endregion Главное окно.
 
-        
+       
     }
 }

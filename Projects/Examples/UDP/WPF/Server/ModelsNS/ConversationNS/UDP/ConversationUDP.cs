@@ -13,6 +13,11 @@ namespace Server.ModelsNS.ConversationNS.UDP
     abstract class ConversationUDP
     {
 
+        static ConversationUDP()
+        {
+            //OpenConnection();
+        }
+
         #region Свойства.
 
         /// <summary>
@@ -43,7 +48,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
 
         #region Методы.        
 
-        static void OpenConnection()
+        internal static void OpenConnection()
         {
             localAddress = IPAddress.Parse("127.0.0.1");
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -102,17 +107,28 @@ namespace Server.ModelsNS.ConversationNS.UDP
             /// синхронной. 
 
             responseData = responseDataSegment.ToArray();
-            Packet.SetAnswerCommandProperties(responseData);
+            arraySize = NumOfNonZeroElements(responseData);
+            if (arraySize > 0)
+            {
+                Packet.SetAnswerCommandProperties(responseData);
+                Array.Clear(responseData, 0, arraySize);
+            }                        
+        }
 
-            //string responseDataHex = GetPacketString(responseData, arraySize);
-            ////string response = Encoding.UTF8.GetString(responseData, 0, responseData.Length);
-            //Array.Clear(responseData, 0, responseData.Length);
+        static ushort NumOfNonZeroElements(byte[] bytes)
+        {
+            ushort numOfNonZeroElements = 0;
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                if (bytes[i] > 0)
+                {
+                    numOfNonZeroElements++;
+                }
+            }
+            return numOfNonZeroElements;
+        }
 
-            //// Вывожу отправленные клиентом данные.
-            //Console.WriteLine($"От клиента: {responseDataHex}");
-        }       
-
-        static void CloseConnection()
+        internal static void CloseConnection()
         {
             socket.Close();
         }

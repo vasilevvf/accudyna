@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Client" Height="264" Width="699" Loaded="Window_Loaded">
+        Title="Client" Height="264" Width="699" Loaded="Window_Loaded" Closed="Window_Closed">
     <Grid Background="#d2d2d2" Margin="0,0,0,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="657*"/>
@@ -19,43 +19,43 @@
                         <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Header"/>
-                                <TextBox x:Name="textBox" TextWrapping="Wrap" Text="0x8585"/>
+                                <TextBox x:Name="textBox" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Axis ID"/>
-                                <TextBox x:Name="textBox1" TextWrapping="Wrap" Text="TextBox"/>
+                                <TextBox x:Name="textBox1" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
                             <StackPanel Height="52" Width="100">
                                 <Label Content="Command Mode"/>
-                                <TextBox x:Name="textBox2" TextWrapping="Wrap" Text="TextBox"/>
+                                <TextBox x:Name="textBox2" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
-                            <StackPanel Height="52" Width="61">
+                            <StackPanel Height="52">
                                 <Label Content="C1"/>
-                                <TextBox x:Name="textBox3" TextWrapping="Wrap" Text="TextBox"/>
+                                <TextBox x:Name="textBox3" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
-                            <StackPanel Height="52" Width="61">
+                            <StackPanel Height="52">
                                 <Label Content="C2"/>
-                                <TextBox x:Name="textBox4" TextWrapping="Wrap" Text="TextBox"/>
+                                <TextBox x:Name="textBox4" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
-                            <StackPanel Height="52" Width="61">
+                            <StackPanel Height="52">
                                 <Label Content="C3"/>
-                                <TextBox x:Name="textBox5" TextWrapping="Wrap" Text="TextBox"/>
+                                <TextBox x:Name="textBox5" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
-                            <StackPanel Height="52" Width="61">
+                            <StackPanel Height="52">
                                 <Label Content="C4"/>
-                                <TextBox x:Name="textBox6" TextWrapping="Wrap" Text="TextBox"/>
+                                <TextBox x:Name="textBox6" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Reserved"/>
-                                <TextBox x:Name="textBox7" TextWrapping="Wrap" Text="TextBox"/>
+                                <TextBox x:Name="textBox7" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Counter"/>
-                                <TextBox x:Name="textBox8" TextWrapping="Wrap" Text="TextBox"/>
+                                <TextBox x:Name="textBox8" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
                             <StackPanel Height="52" Width="65">
                                 <Label Content="Checksum"/>
-                                <TextBox x:Name="textBox9" TextWrapping="Wrap" Text="TextBox"/>
+                                <TextBox x:Name="textBox9" TextWrapping="Wrap" Text=""/>
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
@@ -76,27 +76,27 @@
                     <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                         <StackPanel Height="52" Width="61">
                             <Label Content="Header"/>
-                            <TextBox x:Name="textBox10" TextWrapping="Wrap" Text="TextBox"/>
+                            <TextBox x:Name="textBox10" TextWrapping="Wrap" Text="0xAAAA"/>
                         </StackPanel>
                         <StackPanel Height="52" Width="61">
                             <Label Content="Type"/>
-                            <TextBox x:Name="textBox11" TextWrapping="Wrap" Text="TextBox"/>
+                            <TextBox x:Name="textBox11" TextWrapping="Wrap" Text="0x01"/>
                         </StackPanel>
                         <StackPanel Height="52">
                             <Label Content="F1"/>
-                            <TextBox x:Name="textBox12" TextWrapping="Wrap" Text="TextBox"/>
+                            <TextBox x:Name="textBox12" TextWrapping="Wrap" Text="0.2"/>
                         </StackPanel>
                         <StackPanel Height="52">
                             <Label Content="F2"/>
-                            <TextBox x:Name="textBox13" TextWrapping="Wrap" Text="TextBox"/>
+                            <TextBox x:Name="textBox13" TextWrapping="Wrap" Text="0.3"/>
                         </StackPanel>
                         <StackPanel Height="52">
                             <Label Content="F3"/>
-                            <TextBox x:Name="textBox14" TextWrapping="Wrap" Text="TextBox"/>
+                            <TextBox x:Name="textBox14" TextWrapping="Wrap" Text="0.4"/>
                         </StackPanel>
                         <StackPanel Height="52" Width="65">
                             <Label Content="Checksum"/>
-                            <TextBox x:Name="textBox15" TextWrapping="Wrap" Text="TextBox"/>
+                            <TextBox x:Name="textBox15" TextWrapping="Wrap" Text=""/>
                         </StackPanel>
 
                     </StackPanel>

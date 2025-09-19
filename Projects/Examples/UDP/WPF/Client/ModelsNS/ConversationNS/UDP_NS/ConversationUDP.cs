@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace Client.ModelsNS.ConversationNS.UDP_NS
 {
-    internal class ConversationUDP
+    abstract class ConversationUDP
     {
         #region Статический конструктор.
 
         static ConversationUDP()
         {
-            OpenConnection();
-            LaunchTimerServerMessage();
+            //OpenConnection();
+            //LaunchTimerServerMessage();
         }
 
         #endregion Статический конструктор.
@@ -35,7 +35,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         }
 
         static Socket socket;
-        static int arraySize; // Размер принятого массива.
+        static ushort arraySize; // Размер принятого массива.
         static IPAddress localAddress;
 
         // Буфер для получения данных.
@@ -71,8 +71,10 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         /// <summary>
         /// Запустить таймер запросов сервера.
         /// </summary>
-        static void LaunchTimerServerMessage()
+        internal static void LaunchTimerServerMessage()
         {
+            OpenConnection();
+
             // Делегат для типа Timer.
             timerServerMessageCallback = new TimerCallback(TimerServerMessageCallback);            
 
@@ -123,13 +125,26 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
                     SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
             
             responseData = responseDataSegment.ToArray();
-            arraySize = responseData.Length;
+            arraySize = NumOfNonZeroElements(responseData);
 
             if (arraySize > 0)
             {
                 Packet.SetCommandProperties(responseData);
                 Array.Clear(responseData, 0, arraySize);
             }            
+        }
+
+        static ushort NumOfNonZeroElements(byte[] bytes)
+        {
+            ushort numOfNonZeroElements = 0;
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                if (bytes[i] > 0)
+                {
+                    numOfNonZeroElements++;
+                }
+            }
+            return numOfNonZeroElements;
         }
 
         internal static void WriteBuffer(byte[] bytes)
@@ -146,6 +161,11 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
                 timerServerMessage.Dispose();
             }
 
+        }
+
+        internal static void CloseConnection()
+        {
+            socket.Close();
         }
 
         #endregion Методы.

@@ -16,13 +16,28 @@ namespace ArraySize
             ArraySegment<byte> responseDataSegment = new ArraySegment<byte>(responseData);
             int arrayLength = responseData.Length;
             int dataSegmentLength = responseDataSegment.Count();
-            int byteLength = Buffer.ByteLength(responseData);            
+            int byteLength = Buffer.ByteLength(responseData);
+            ushort numOfNonZeroElements = NumOfNonZeroElements(responseData);
 
             Console.WriteLine($"arrayLength: {arrayLength}");
             Console.WriteLine($"dataSegmentLength: {dataSegmentLength}");
-            Console.WriteLine($"byteLength: {byteLength}");            
+            Console.WriteLine($"byteLength: {byteLength}");
+            Console.WriteLine($"numOfNonZeroElements: {numOfNonZeroElements}");
 
             Console.ReadLine();
+        }
+
+        static ushort NumOfNonZeroElements(byte[] bytes)
+        {
+            ushort numOfNonZeroElements = 0;
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                if (bytes[i] > 0)
+                {
+                    numOfNonZeroElements++;
+                }
+            }
+            return numOfNonZeroElements;
         }
     }
 }

@@ -128,7 +128,7 @@ namespace ClientConsole
                 Console.WriteLine($"На сервер: {requestDataHex}");
             }            
 
-            static void CloseConnection()
+            internal static void CloseConnection()
             {
                 socket.Close();
             }

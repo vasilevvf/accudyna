@@ -1,5 +1,6 @@
 ﻿using Server.ModelsNS.ConversationNS.UDP;
 using Server.ModelsNS.ConversationNS.UDP.DataPackets;
+using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,28 +17,13 @@ namespace Server
 
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         #endregion Конструктор.
 
         #region Главное окно.
-
-        #region Загрузка главного окна.        
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-
-            #region Таймер обновления GUI.
-
-            LaunchTimerUpdateGUI();
-
-            #endregion Таймер обновления GUI.
-
-        }
-
-        #endregion Загрузка главного окна.
-
+        
         #region Таймер обновления GUI.
 
         #region Настройки.
@@ -98,9 +84,24 @@ namespace Server
             commandCounter = GetByteFromString(textBox7.Text, out is_C4_FormatError);
         }
 
-        static byte GetByteFromString(string str, out bool isFormatError)
+        static byte GetByteFromString(string hexString, out bool isFormatError)
         {
-            bool isSuccess = byte.TryParse(str, out byte result);
+            isFormatError = false;
+
+            if (hexString == string.Empty)
+            {
+                return 0;
+            }
+
+            // Удалить "0x" в начале.
+            if (hexString.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                hexString = hexString.Substring(2);
+            }
+
+            bool isSuccess = byte.TryParse(hexString,
+                NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo,
+                out byte result);
 
             if (isSuccess)
             {
@@ -115,16 +116,24 @@ namespace Server
         /// <summary>
         /// Получить ushort из string.
         /// </summary>        
-        internal static ushort GetUshortFromString(string str, out bool isFormatError)
+        internal static ushort GetUshortFromString(string hexString, out bool isFormatError)
         {
             isFormatError = false;
 
-            if (str == string.Empty)
+            if (hexString == string.Empty)
             {
                 return 0;
             }
+            
+            // Удалить "0x" в начале.
+            if (hexString.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+            {
+                hexString = hexString.Substring(2);
+            }
 
-            bool isSuccess = ushort.TryParse(str, out ushort result);
+            bool isSuccess = ushort.TryParse(hexString, 
+                NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, 
+                out ushort result);
 
             if (isSuccess)
             {
@@ -181,6 +190,26 @@ namespace Server
 
         #region События.
 
+        #region Загрузка главного окна.        
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            #region Открыть соединение UDP.
+
+            ConversationUDP.OpenConnection();
+
+            #endregion Открыть соединение UDP.
+
+            #region Таймер обновления GUI.
+
+            LaunchTimerUpdateGUI();
+
+            #endregion Таймер обновления GUI.
+
+        }
+
+        #endregion Загрузка главного окна.
+
         #region Кнопки.
 
         #region Отправить.
@@ -196,35 +225,35 @@ namespace Server
         {
             if (isHeaderFormatError)
             {
-                MessageBox.Show("Ошибка в написании \"Header\". Градусы должны быть ushort.");
+                MessageBox.Show("Ошибка в написании \"Header\". Header должен быть ushort.");
             }
             if (isAxisID_FormatError)
             {
-                MessageBox.Show("Ошибка в написании \"Axis ID\". Градусы должны быть byte.");
+                MessageBox.Show("Ошибка в написании \"Axis ID\". \"Axis ID\" должен быть byte.");
             }
             if (isCommandModeFormatError)
             {
-                MessageBox.Show("Ошибка в написании \"Command Mode\". Градусы должны быть byte.");
+                MessageBox.Show("Ошибка в написании \"Command Mode\". \"Command Mode\" должен быть byte.");
             }
             if (is_C1_FormatError)
             {
-                MessageBox.Show("Ошибка в написании \"C1\". Градусы должны быть float.");
+                MessageBox.Show("Ошибка в написании \"C1\". C1 должен быть float.");
             }
             if (is_C2_FormatError)
             {
-                MessageBox.Show("Ошибка в написании \"C2\". Градусы должны быть float.");
+                MessageBox.Show("Ошибка в написании \"C2\". C2 должен быть float.");
             }
             if (is_C3_FormatError)
             {
-                MessageBox.Show("Ошибка в написании \"C3\". Градусы должны быть float.");
+                MessageBox.Show("Ошибка в написании \"C3\". C3 должен быть float.");
             }
             if (is_C4_FormatError)
             {
-                MessageBox.Show("Ошибка в написании \"C4\". Градусы должны быть byte.");
+                MessageBox.Show("Ошибка в написании \"C4\". C4 должен быть byte.");
             }
             if (isCounterFormatError)
             {
-                MessageBox.Show("Ошибка в написании \"Counter\". Градусы должны быть byte.");
+                MessageBox.Show("Ошибка в написании \"Counter\". Counter должен быть byte.");
             }
         }
 
@@ -233,6 +262,7 @@ namespace Server
             Packet.CommandHeader = commandHeader; // 0x8585.
             Packet.CommandAxisID = commandAxisID;
             Packet.CommandCommandMode = commandCommandMode;
+            Packet.CommandC1 = command_c1;
             Packet.CommandC2 = command_c2;
             Packet.CommandC3 = command_c3;
             Packet.CommandC4 = command_c4;
@@ -262,6 +292,15 @@ namespace Server
         #endregion Отправить.
 
         #endregion Кнопки.
+
+        #region Закрытие окна.
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            ConversationUDP.CloseConnection();
+        }        
+
+        #endregion Закрытие окна.
 
         #endregion События.
 
@@ -411,10 +450,9 @@ namespace Server
             set { isCounterFormatError = value; }
         }
 
+
         #endregion Свойства.
 
-        #endregion Главное окно.
-
-
+        #endregion Главное окно.        
     }
 }
