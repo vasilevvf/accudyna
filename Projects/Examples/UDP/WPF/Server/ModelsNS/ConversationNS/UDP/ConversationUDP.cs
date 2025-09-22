@@ -61,7 +61,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
         {            
             WriteBuffer(bytes);
 
-            Thread.Sleep(1500);
+            Thread.Sleep(50);
 
             ReadBuffer();
         }
@@ -69,13 +69,19 @@ namespace Server.ModelsNS.ConversationNS.UDP
         static void WriteBuffer(byte[] bytes)
         {
             // Отправляю данные.            
-            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));            
+            //socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
+
+            // Буфер для отправки данных.
+            //byte[] receiveData = new byte[1024];
+            ArraySegment<byte> sendDataSegment = new ArraySegment<byte>(bytes);
+            socket.SendToAsync(sendDataSegment,
+                    SocketFlags.None, new IPEndPoint(localAddress, sendPort));
         }
        
         static void ReadBuffer()
         {
             // Буфер для получения данных.
-            byte[] responseData = new byte[64];
+            byte[] responseData = new byte[1024];
             ArraySegment<byte> responseDataSegment = new ArraySegment<byte>(responseData);
 
             try
@@ -111,7 +117,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
             if (arraySize > 0)
             {
                 Packet.SetAnswerCommandProperties(responseData);
-                Array.Clear(responseData, 0, arraySize);
+                Array.Clear(responseData, 0, responseData.Length);
             }                        
         }
 

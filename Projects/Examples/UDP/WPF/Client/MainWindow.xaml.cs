@@ -74,7 +74,7 @@ namespace Client
         {
             CheckCommandInputErrors();
             UpdatePacket();
-            SendAnswerCommand();
+            SendAnswerCommandTask();
         }
 
         private void CheckCommandInputErrors()
@@ -114,7 +114,7 @@ namespace Client
             Packet.AnswerCommand_f3 = answerCommand_f3;
         }
 
-        private void SendAnswerCommand()
+        private void SendAnswerCommandTask()
         {
             /// Выполнять в отдельном потоке. Иначе GUI может застыть.
             Task.Run(() =>
@@ -122,7 +122,7 @@ namespace Client
                 byte[] answerCommandBytes = Packet.GetAnswerCommandBytesFromProperties();
                 ConversationUDP.WriteBuffer(answerCommandBytes);
             });
-        }
+        }        
 
         #endregion Отправить.
 
@@ -276,6 +276,11 @@ namespace Client
 
         private void UpdatePacketPropertiesOnGUI()
         {
+            if (!IsNeedUpdateCommand)
+            {
+                return;
+            }
+
             textBox.Text = Packet.CommandHeaderString;
             textBox1.Text = Packet.CommandAxisID_String;
             textBox2.Text = Packet.CommandCommandModeString;
@@ -289,6 +294,8 @@ namespace Client
 
             // Обновление конрольной суммы ответа на команду.
             textBox15.Text = Packet.AnswerCommandChecksumString;
+
+            isNeedUpdateCommand = false;
         }
 
         #endregion Методы.
@@ -299,7 +306,13 @@ namespace Client
 
         #region Command.
 
+        private static bool isNeedUpdateCommand;
 
+        public static bool IsNeedUpdateCommand
+        {
+            get { return isNeedUpdateCommand; }
+            set { isNeedUpdateCommand = value; }
+        }
 
         #endregion Command.
 

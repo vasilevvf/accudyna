@@ -369,6 +369,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
             CommandChecksum = commandUnion.checksum;
 
             isCommandReceived = true;
+            MainWindow.IsNeedUpdateCommand = true;
         }
 
         /// <summary>

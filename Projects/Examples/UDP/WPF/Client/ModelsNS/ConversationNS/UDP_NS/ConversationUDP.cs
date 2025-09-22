@@ -39,7 +39,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         static IPAddress localAddress;
 
         // Буфер для получения данных.
-        static byte[] responseData;
+        //static byte[] responseData;
 
         /// <summary>
         /// 
@@ -57,17 +57,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         #endregion Свойства.
 
         #region Методы.
-
-        static void OpenConnection()
-        {
-            responseData = new byte[64];
-            localAddress = IPAddress.Parse("127.0.0.1");
-            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-            // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
-            socket.Bind(new IPEndPoint(localAddress, receivePort));
-        }
-
+        
         /// <summary>
         /// Запустить таймер запросов сервера.
         /// </summary>
@@ -82,8 +72,18 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             timerServerMessage = new Timer(timerServerMessageCallback, null, 0, periodTimerServerMessage);
         }
 
+        static void OpenConnection()
+        {
+            //responseData = new byte[64];
+            localAddress = IPAddress.Parse("127.0.0.1");
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+            // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
+            socket.Bind(new IPEndPoint(localAddress, receivePort));
+        }
+
         static Timer timerServerMessage;                   // Таймер сообщений сервера.
-        const int periodTimerServerMessage = 50;           // Период таймера сообщений сервера.                                                        
+        const int periodTimerServerMessage = 3060;          // Период таймера сообщений сервера.                                                        
         static TimerCallback timerServerMessageCallback;   // Делегат для типа Timer.        
 
         // Функция обратного вызова для таймера сообщений сервера.
@@ -122,7 +122,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             /// она дождётся завершения функции Receive() и 
             /// мягко завершит работу.
             socket.ReceiveFromAsync(responseDataSegment,
-                    SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
+                    SocketFlags.None, new IPEndPoint(localAddress, receivePort));
             
             responseData = responseDataSegment.ToArray();
             arraySize = NumOfNonZeroElements(responseData);
@@ -130,7 +130,8 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             if (arraySize > 0)
             {
                 Packet.SetCommandProperties(responseData);
-                Array.Clear(responseData, 0, arraySize);
+                Array.Clear(responseData, 0, responseData.Length);
+                SendAnswerCommand();
             }            
         }
 
@@ -150,7 +151,17 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         internal static void WriteBuffer(byte[] bytes)
         {
             // Отправляю данные.            
-            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));            
+            //socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
+
+            ArraySegment<byte> sendDataSegment = new ArraySegment<byte>(bytes);
+            socket.SendToAsync(sendDataSegment,
+                    SocketFlags.None, new IPEndPoint(localAddress, sendPort));
+        }
+
+        private static void SendAnswerCommand()
+        {
+            byte[] answerCommandBytes = Packet.GetAnswerCommandBytesFromProperties();
+            WriteBuffer(answerCommandBytes);
         }
 
         internal static void StopTimerServerMessage()

@@ -274,10 +274,13 @@ namespace Server
             /// Выполнять в отдельном потоке. Иначе GUI может застыть.
             Task.Run(() =>
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     Packet.IsAnswerCommandReceived = false;
                     byte[] commandBytes = Packet.GetCommandBytesFromProperties();
+
+                    //byte[] commandBytes1 = new byte[1024];
+                    //commandBytes.CopyTo(commandBytes1, 0);
 
                     ConversationUDP.SendRequestToClient(commandBytes);
 
@@ -285,6 +288,8 @@ namespace Server
                     {
                         break;
                     }
+
+                    Thread.Sleep(50);
                 }
             });
         }
