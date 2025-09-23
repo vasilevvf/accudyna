@@ -107,7 +107,7 @@ namespace Client
 
         private void UpdatePacket()
         {
-            Packet.AnswerCommandHeader = answerCommandHeader;
+            //Packet.AnswerCommandHeader = answerCommandHeader;
             Packet.AnswerCommandType = answerCommandType;
             Packet.AnswerCommand_f1 = answerCommand_f1;
             Packet.AnswerCommand_f2 = answerCommand_f2;
@@ -175,6 +175,7 @@ namespace Client
         {
             UpdatePacketPropertiesFromGUI();
             UpdatePacketPropertiesOnGUI();
+            UpdatePacket();
         }
 
         private void UpdatePacketPropertiesFromGUI()
@@ -276,7 +277,7 @@ namespace Client
 
         private void UpdatePacketPropertiesOnGUI()
         {
-            if (!IsNeedUpdateCommand)
+            if (!IsNeedUpdateCommandOnGUI)
             {
                 return;
             }
@@ -295,7 +296,7 @@ namespace Client
             // Обновление конрольной суммы ответа на команду.
             textBox15.Text = Packet.AnswerCommandChecksumString;
 
-            isNeedUpdateCommand = false;
+            isNeedUpdateCommandOnGUI = false;
         }
 
         #endregion Методы.
@@ -306,12 +307,12 @@ namespace Client
 
         #region Command.
 
-        private static bool isNeedUpdateCommand;
+        private static bool isNeedUpdateCommandOnGUI;
 
-        public static bool IsNeedUpdateCommand
+        public static bool IsNeedUpdateCommandOnGUI
         {
-            get { return isNeedUpdateCommand; }
-            set { isNeedUpdateCommand = value; }
+            get { return isNeedUpdateCommandOnGUI; }
+            set { isNeedUpdateCommandOnGUI = value; }
         }
 
         #endregion Command.

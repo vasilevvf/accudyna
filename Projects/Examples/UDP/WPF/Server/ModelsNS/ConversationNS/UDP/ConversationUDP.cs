@@ -52,6 +52,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
         {
             localAddress = IPAddress.Parse("127.0.0.1");
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.ReceiveTimeout = 1000;
 
             // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
             socket.Bind(new IPEndPoint(localAddress, receivePort));
@@ -61,7 +62,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
         {            
             WriteBuffer(bytes);
 
-            Thread.Sleep(50);
+            //Thread.Sleep(50);
 
             ReadBuffer();
         }
@@ -69,13 +70,13 @@ namespace Server.ModelsNS.ConversationNS.UDP
         static void WriteBuffer(byte[] bytes)
         {
             // Отправляю данные.            
-            //socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
+            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
 
             // Буфер для отправки данных.
             //byte[] receiveData = new byte[1024];
-            ArraySegment<byte> sendDataSegment = new ArraySegment<byte>(bytes);
-            socket.SendToAsync(sendDataSegment,
-                    SocketFlags.None, new IPEndPoint(localAddress, sendPort));
+            //ArraySegment<byte> sendDataSegment = new ArraySegment<byte>(bytes);
+            //socket.SendToAsync(sendDataSegment,
+            //        SocketFlags.None, new IPEndPoint(localAddress, sendPort));
         }
        
         static void ReadBuffer()
@@ -83,6 +84,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
             // Буфер для получения данных.
             byte[] responseData = new byte[1024];
             ArraySegment<byte> responseDataSegment = new ArraySegment<byte>(responseData);
+            int readBytesCount = 0;
 
             try
             {
@@ -97,12 +99,14 @@ namespace Server.ModelsNS.ConversationNS.UDP
                 /// использовать ReadAsync(). Так как, если клиент по 
                 /// какой либо причине не обработает запрос, сервер
                 /// повиснет в ожидании ответа.            
-                socket.ReceiveFromAsync(responseDataSegment,
-                    SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
+                //socket.ReceiveFromAsync(responseDataSegment,
+                //    SocketFlags.None, new IPEndPoint(IPAddress.Any, 0));
+                
+                readBytesCount = socket.Receive(responseData, SocketFlags.None);                              
             }
             catch (SocketException)
             {
-                Console.WriteLine($"Клиент не подключен.");
+                //Console.WriteLine($"Клиент не подключен.");
                 return;
             }
 
@@ -114,10 +118,10 @@ namespace Server.ModelsNS.ConversationNS.UDP
 
             responseData = responseDataSegment.ToArray();
             arraySize = NumOfNonZeroElements(responseData);
-            if (arraySize > 0)
+            if (readBytesCount > 0)
             {
                 Packet.SetAnswerCommandProperties(responseData);
-                Array.Clear(responseData, 0, responseData.Length);
+                //Array.Clear(responseData, 0, responseData.Length);
             }                        
         }
 

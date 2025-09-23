@@ -14,15 +14,14 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
         static Packet()
         {
             AnswerCommandChecksumString = "";
+            answerCommandHeader = 0xAAAA;
         }
         
         #endregion Статический конструктор.
 
         #region Command.
 
-        #region Свойства.
-
-        #region Command.
+        #region Свойства.        
 
         private static ushort commandHeader;
 
@@ -220,87 +219,96 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
         {
             get { return isCommandReceived; }
             set { isCommandReceived = value; }
-        }
-
-        #endregion Command.
+        }        
        
         #endregion Свойства.
 
-        #region Методы.          
+        #region Методы свойств.          
 
         private static string GetCommandHeaderString()
         {            
-            string hexString = GetStringFromInt(commandHeader);
+            string hexString = GetStringFromIntReverse(commandHeader);
             return hexString;
         }
 
         private static string GetCommandAxisID_String()
         {            
-            string hexString = GetStringFromInt(commandAxisID);
+            string hexString = GetStringFromIntReverse(commandAxisID);
             return hexString;
         }
 
         private static string GetCommandCommandModeString()
         {            
-            string hexString = GetStringFromInt(commandCommandMode);
+            string hexString = GetStringFromIntReverse(commandCommandMode);
             return hexString;
         }
 
         private static string GetCommand_c1_String()
         {
-            string hexString = GetStringFromFloat(command_c1);
+            string hexString = GetStringFromFloatReverse(command_c1);
             return hexString;
         }
 
         private static string GetCommand_c2_String()
         {
-            string hexString = GetStringFromFloat(command_c2);
+            string hexString = GetStringFromFloatReverse(command_c2);
             return hexString;
         }
 
         private static string GetCommand_c3_String()
         {
-            string hexString = GetStringFromFloat(command_c3);
+            string hexString = GetStringFromFloatReverse(command_c3);
             return hexString;
         }
 
         private static string GetCommand_c4_String()
         {
-            string hexString = GetStringFromInt(command_c4);
+            string hexString = GetStringFromIntReverse(command_c4);
             return hexString;
         }
 
         private static string GetCommandReservedString()
         {
-            string hexString = GetStringFromInt(commandReserved);
+            string hexString = GetStringFromIntReverse(commandReserved);
             return hexString;
         }
 
         private static string GetCommandCounterString()
         {
-            string hexString = GetStringFromInt(commandCounter);
+            string hexString = GetStringFromIntReverse(commandCounter);
             return hexString;
         }
 
         private static string GetCommandChecksumString()
         {
-            string hexString = GetStringFromInt(commandChecksum);
+            string hexString = GetStringFromIntReverse(commandChecksum);
             return hexString;
-        }
+        }        
 
-        static string GetStringFromInt(byte val)
+        static string GetStringFromIntReverse(byte val)
         {
-            string hex = string.Format("{0:X2}", val);
-            return hex;
+            // Получить массив байтов.
+            byte[] valueBytes = { val };
+
+            // Преобразовать байты в строку байтов.
+            string valueHexString = BitConverter.ToString(valueBytes);
+            return valueHexString;
         }
 
-        static string GetStringFromInt(ushort val)
+        static string GetStringFromIntReverse(ushort val)
         {
-            string hex = string.Format("{0:X2}", val);
-            return hex;
+            // Получить массив байтов.
+            byte[] valueBytes = BitConverter.GetBytes(val);
+
+            // Инвертировать порядок байтов в массиве.
+            Array.Reverse(valueBytes);
+
+            // Преобразовать байты в строку байтов.
+            string valueHexString = BitConverter.ToString(valueBytes);
+            return valueHexString;
         }
 
-        static string GetStringFromFloat(float floatValue)
+        static string GetStringFromFloatReverse(float floatValue)
         {
             // Получить массив байтов.
             byte[] valueBytes = BitConverter.GetBytes(floatValue);
@@ -311,9 +319,9 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
             // Преобразовать байты в строку байтов.
             string valueHexString = BitConverter.ToString(valueBytes);
             return valueHexString;
-        }        
-        
-        #endregion Методы.
+        }
+
+        #endregion Методы свойств.
 
         #region Объединение.
 
@@ -369,7 +377,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
             CommandChecksum = commandUnion.checksum;
 
             isCommandReceived = true;
-            MainWindow.IsNeedUpdateCommand = true;
+            MainWindow.IsNeedUpdateCommandOnGUI = true;
         }
 
         /// <summary>
@@ -477,6 +485,42 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
             return hexString;
         }
 
+        static string GetStringFromInt(byte val)
+        {
+            // Получить массив байтов.
+            byte[] valueBytes = { val };
+
+            // Преобразовать байты в строку байтов.
+            string valueHexString = BitConverter.ToString(valueBytes);
+            return valueHexString;
+        }
+
+        static string GetStringFromInt(ushort val)
+        {
+            // Получить массив байтов.
+            byte[] valueBytes = BitConverter.GetBytes(val);
+
+            // Инвертировать порядок байтов в массиве.
+            //Array.Reverse(valueBytes);
+
+            // Преобразовать байты в строку байтов.
+            string valueHexString = string.Format("x{0:X2}{1:X2}", valueBytes[0], valueBytes[1]);
+            return valueHexString;
+        }
+
+        static string GetStringFromFloat(float floatValue)
+        {
+            // Получить массив байтов.
+            byte[] valueBytes = BitConverter.GetBytes(floatValue);
+
+            // Инвертировать порядок байтов в массиве.
+            //Array.Reverse(valueBytes);
+
+            // Преобразовать байты в строку байтов.
+            string valueHexString = BitConverter.ToString(valueBytes);
+            return valueHexString;
+        }
+
         #endregion Методы свойств.
 
         #region Основные методы.
@@ -538,7 +582,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
         /// </summary>        
         internal static void AddCRC(ref byte[] bytes)
         {
-            ushort crc = CalculateCRC(in bytes, (ushort)bytes.Count());
+            ushort crc = CalculateChecksum(in bytes);
 
             // Записать CRC в 2 последние байта массива.            
             // Порядок байт в CRC: старший байт первый.
@@ -549,30 +593,26 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
         }
 
         /// <summary>
-        /// Находит CRC всего массива кроме двух последних байт.
+        /// Находит checksum массива байт. 
+        /// Сумма первых 13 байт массива, записанная в ushort.
         /// </summary>        
-        internal static ushort CalculateCRC(in byte[] bytes, ushort len)
+        internal static ushort CalculateChecksum(in byte[] bytes)
         {
-            // Пример: 
-            // in byte[] bytes;
-            // start = 2; end = 2;
-            // CRC для bytes кроме двух первых
-            // и двух последних байт.
-
-            const byte start = 2;
-            const byte end = 2;
-            ushort crc = 0xFFFF;
+            const byte NumOfFirstElem = 13;
+            ushort checksum = 0;
             byte i;
-            byte j = start; // CRC кроме 2 начальных байт.
 
-            while (len-- > start + end) // CRC кроме 2 последних байт.
+            int len = bytes.Length;
+            if (len < NumOfFirstElem)
             {
-                crc ^= (ushort)(bytes[j++] << 8);
-
-                for (i = 0; i < 8; i++)
-                    crc = (crc & 0x8000) > 0 ? (ushort)(crc << 1 ^ 0x1021) : (ushort)(crc << 1);
+                return 0;
             }
-            return crc;
+
+            for (i = 0; i < NumOfFirstElem; i++)
+            {
+                checksum += bytes[i];
+            }
+            return checksum;
         }
 
         #endregion Основные методы.

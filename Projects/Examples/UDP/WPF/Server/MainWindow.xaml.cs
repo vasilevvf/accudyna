@@ -173,6 +173,11 @@ namespace Server
 
         private void UpdatePacketPropertiesOnGUI()
         {
+            if (!isNeedUpdateAnswerCommandOnGUI)
+            {
+                return;
+            }
+
             textBox10.Text = Packet.AnswerCommandHeaderString;
             textBox11.Text = Packet.AnswerCommandTypeString;
             textBox12.Text = Packet.AnswerCommand_f1_String;
@@ -182,6 +187,8 @@ namespace Server
 
             // Обновление контрольной суммы command.
             textBox9.Text = Packet.CommandChecksumString;
+
+            isNeedUpdateAnswerCommandOnGUI = false; 
         }
 
         #endregion Методы.
@@ -289,7 +296,7 @@ namespace Server
                         break;
                     }
 
-                    Thread.Sleep(50);
+                    //Thread.Sleep(50);
                 }
             });
         }
@@ -303,13 +310,15 @@ namespace Server
         private void Window_Closed(object sender, EventArgs e)
         {
             ConversationUDP.CloseConnection();
-        }        
+        }
 
         #endregion Закрытие окна.
 
         #endregion События.
 
         #region Свойства.
+
+        #region Command.
 
         private static ushort commandHeader;
 
@@ -455,6 +464,19 @@ namespace Server
             set { isCounterFormatError = value; }
         }
 
+        #endregion Command.
+
+        #region AnswerCommand.
+
+        private static bool isNeedUpdateAnswerCommandOnGUI;
+
+        public static bool IsNeedUpdateAnswerCommandOnGUI
+        {
+            get { return isNeedUpdateAnswerCommandOnGUI; }
+            set { isNeedUpdateAnswerCommandOnGUI = value; }
+        }
+
+        #endregion AnswerCommand.
 
         #endregion Свойства.
 

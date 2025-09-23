@@ -78,12 +78,14 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             localAddress = IPAddress.Parse("127.0.0.1");
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
+            socket.ReceiveTimeout = 100;
+
             // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
             socket.Bind(new IPEndPoint(localAddress, receivePort));
         }
 
         static Timer timerServerMessage;                   // Таймер сообщений сервера.
-        const int periodTimerServerMessage = 3060;          // Период таймера сообщений сервера.                                                        
+        const int periodTimerServerMessage = 560;          // Период таймера сообщений сервера.                                                        
         static TimerCallback timerServerMessageCallback;   // Делегат для типа Timer.        
 
         // Функция обратного вызова для таймера сообщений сервера.
@@ -113,24 +115,43 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             /// можно использовать Receive(). 
             /// Receive() запускается в while(true), в выделенном потоке.
             /// ReceiveFromAsync() запускается в таймере.
-            /// В случае завершения программы по событию пользователя,
-            /// возникает вопрос: как выйти из цикла while(true), когда
+            /// Возникает вопрос: в случае завершения программы по 
+            /// событию пользователя, как выйти из цикла while(true), когда
             /// функция Receive() запущена и ждёт байты в буфере? Ответ:
             /// завершать поток в котором запущен этот цикл. Но этот
-            /// метод грубоват. Поэтому лучше использовать Receive().
+            /// метод грубоват. Поэтому лучше использовать ReceiveFromAsync().
             /// Тогда при запросе завершения программы от пользователя, 
-            /// она дождётся завершения функции Receive() и 
+            /// она дождётся завершения функции ReceiveFromAsync() и 
             /// мягко завершит работу.
-            socket.ReceiveFromAsync(responseDataSegment,
-                    SocketFlags.None, new IPEndPoint(localAddress, receivePort));
-            
-            responseData = responseDataSegment.ToArray();
-            arraySize = NumOfNonZeroElements(responseData);
-
-            if (arraySize > 0)
+            /// Попробол ReceiveFromAsync(). Не знаю как она работает.
+            /// Но по описанному выше алгоритму не работает. Решил
+            /// остановиться на Receive() + задать время ожидания на
+            /// приём сообщения socket.ReceiveTimeout. По итечении
+            /// socket.ReceiveTimeout вылетает исключение SocketException.
+            /// Плохой вариант работать на исключениях. Но использовать
+            /// while(true) и Receive() мне еще больше не нравится. Так
+            /// как в клиенте while(true) подойдёт, а в сервере нет. Пусть
+            /// будет единообразие. И в клиенте и в сервере применяю 
+            /// Receive() + socket.ReceiveTimeout.
+            /// 
+            //socket.ReceiveFromAsync(responseDataSegment,
+            //        SocketFlags.None, new IPEndPoint(localAddress, receivePort));
+            int readBytesCount = 0;
+            try
             {
-                Packet.SetCommandProperties(responseData);
-                Array.Clear(responseData, 0, responseData.Length);
+                readBytesCount = socket.Receive(responseData, SocketFlags.None);
+            }
+            catch (SocketException)
+            {
+                
+            }
+            
+            //responseData = responseDataSegment.ToArray();
+            //arraySize = NumOfNonZeroElements(responseData);
+
+            if (readBytesCount > 0)
+            {
+                Packet.SetCommandProperties(responseData);                
                 SendAnswerCommand();
             }            
         }
@@ -151,11 +172,11 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         internal static void WriteBuffer(byte[] bytes)
         {
             // Отправляю данные.            
-            //socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
+            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));
 
-            ArraySegment<byte> sendDataSegment = new ArraySegment<byte>(bytes);
-            socket.SendToAsync(sendDataSegment,
-                    SocketFlags.None, new IPEndPoint(localAddress, sendPort));
+            //ArraySegment<byte> sendDataSegment = new ArraySegment<byte>(bytes);
+            //socket.SendToAsync(sendDataSegment,
+            //        SocketFlags.None, new IPEndPoint(localAddress, sendPort));
         }
 
         private static void SendAnswerCommand()
