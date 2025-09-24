@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
 {
@@ -298,10 +295,8 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
         static string GetStringFromIntReverse(ushort val)
         {
             // Получить массив байтов.
-            byte[] valueBytes = BitConverter.GetBytes(val);
-
-            // Инвертировать порядок байтов в массиве.
-            Array.Reverse(valueBytes);
+            // Обратный порядок.
+            byte[] valueBytes = BitConverter.GetBytes(val);            
 
             // Преобразовать байты в строку байтов.
             string valueHexString = BitConverter.ToString(valueBytes);
@@ -311,10 +306,8 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
         static string GetStringFromFloatReverse(float floatValue)
         {
             // Получить массив байтов.
-            byte[] valueBytes = BitConverter.GetBytes(floatValue);
-
-            // Инвертировать порядок байтов в массиве.
-            Array.Reverse(valueBytes);
+            // Обратный порядок.
+            byte[] valueBytes = BitConverter.GetBytes(floatValue);            
 
             // Преобразовать байты в строку байтов.
             string valueHexString = BitConverter.ToString(valueBytes);
@@ -353,62 +346,6 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
         #endregion Объединение.
 
         #endregion Command.
-
-        #region Таймер сообщений сервера.
-
-        /// <summary>
-        /// Получить значения command свойств из входящих байт.
-        /// </summary>        
-        internal static void SetCommandProperties(byte[] answerCommandBytes)
-        {
-            // Объединение из массива байт.            
-            CommandUnion commandUnion = UnionFromBytes<CommandUnion>(in answerCommandBytes);
-
-            // Из принятого пакета установить параметры.                
-            CommandHeader = commandUnion.header;
-            CommandAxisID = commandUnion.axisID;
-            CommandCommandMode = commandUnion.commandMode;
-            Command_c1 = commandUnion.c1;
-            Command_c2 = commandUnion.c2;
-            Command_c3 = commandUnion.c3;
-            Command_c4 = commandUnion.c4;
-            CommandReserved = commandUnion.reserved;
-            CommandCounter = commandUnion.counter;
-            CommandChecksum = commandUnion.checksum;
-
-            isCommandReceived = true;
-            MainWindow.IsNeedUpdateCommandOnGUI = true;
-        }
-
-        /// <summary>
-        /// Формирует объединение из массива байт.
-        /// </summary>      
-        internal static T UnionFromBytes<T>(in byte[] bytes)
-        {
-            byte[] bytes1 = bytes;
-            int len = Marshal.SizeOf(typeof(T));
-
-            // Бронирует блок памяти в неуправляемой памяти
-            IntPtr ptr = Marshal.AllocHGlobal(len);
-
-            // Копирует управляемый bytes в 
-            // неуправляемый ptr            
-            if (bytes1.Length < len)
-            {
-                bytes1 = new byte[len];
-            }
-            Marshal.Copy(bytes1, 0, ptr, len);
-
-            // Перемещает побайтно неуправляемый ptr 
-            // в управляемый пустой object. 
-            // Затем приводит к типу T.
-            T u = (T)Marshal.PtrToStructure(ptr, typeof(T));
-
-            Marshal.FreeHGlobal(ptr);
-            return u;
-        }
-
-        #endregion Таймер сообщений сервера.
 
         #region AnswerCommand.
 
@@ -501,10 +438,10 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
             byte[] valueBytes = BitConverter.GetBytes(val);
 
             // Инвертировать порядок байтов в массиве.
-            //Array.Reverse(valueBytes);
+            Array.Reverse(valueBytes);
 
             // Преобразовать байты в строку байтов.
-            string valueHexString = string.Format("x{0:X2}{1:X2}", valueBytes[0], valueBytes[1]);
+            string valueHexString = string.Format("0x{0:X2}_{1:X2}", valueBytes[0], valueBytes[1]);
             return valueHexString;
         }
 
@@ -514,10 +451,11 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
             byte[] valueBytes = BitConverter.GetBytes(floatValue);
 
             // Инвертировать порядок байтов в массиве.
-            //Array.Reverse(valueBytes);
+            Array.Reverse(valueBytes);
 
             // Преобразовать байты в строку байтов.
-            string valueHexString = BitConverter.ToString(valueBytes);
+            string valueHexString = string.Format("0x{0:X2}_{1:X2}_{2:X2}_{3:X2}",
+                valueBytes[0], valueBytes[1], valueBytes[2], valueBytes[3]);
             return valueHexString;
         }
 
@@ -543,7 +481,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
 
             // Добавить CRC в хвост массива байт.
             AddCRC(ref answerCommandBytes);
-            
+
             // Обновление конрольной суммы.
             int bytesCount = answerCommandBytes.Length;
             answerCommandChecksum = BitConverter.ToUInt16(
@@ -636,11 +574,67 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS
             public float f3;
             [FieldOffset(15)]
             public ushort cheksum;
-        }        
+        }
 
         #endregion Объединение.
 
         #endregion AnswerCommand.
 
+        #region Таймер сообщений сервера.
+
+        /// <summary>
+        /// Получить значения command свойств из входящих байт.
+        /// </summary>        
+        internal static void SetCommandProperties(byte[] answerCommandBytes)
+        {
+            // Объединение из массива байт.            
+            CommandUnion commandUnion = UnionFromBytes<CommandUnion>(in answerCommandBytes);
+
+            // Из принятого пакета установить параметры.                
+            CommandHeader = commandUnion.header;
+            CommandAxisID = commandUnion.axisID;
+            CommandCommandMode = commandUnion.commandMode;
+            Command_c1 = commandUnion.c1;
+            Command_c2 = commandUnion.c2;
+            Command_c3 = commandUnion.c3;
+            Command_c4 = commandUnion.c4;
+            CommandReserved = commandUnion.reserved;
+            CommandCounter = commandUnion.counter;
+            CommandChecksum = commandUnion.checksum;
+
+            isCommandReceived = true;
+            MainWindow.IsNeedUpdateCommandOnGUI = true;
+        }
+
+        /// <summary>
+        /// Формирует объединение из массива байт.
+        /// </summary>      
+        internal static T UnionFromBytes<T>(in byte[] bytes)
+        {
+            byte[] bytes1 = bytes;
+            int len = Marshal.SizeOf(typeof(T));
+
+            // Бронирует блок памяти в неуправляемой памяти
+            IntPtr ptr = Marshal.AllocHGlobal(len);
+
+            // Копирует управляемый bytes в 
+            // неуправляемый ptr            
+            if (bytes1.Length < len)
+            {
+                bytes1 = new byte[len];
+            }
+            Marshal.Copy(bytes1, 0, ptr, len);
+
+            // Перемещает побайтно неуправляемый ptr 
+            // в управляемый пустой object. 
+            // Затем приводит к типу T.
+            T u = (T)Marshal.PtrToStructure(ptr, typeof(T));
+
+            Marshal.FreeHGlobal(ptr);
+            return u;
+        }
+
+        #endregion Таймер сообщений сервера.
+        
     }
 }

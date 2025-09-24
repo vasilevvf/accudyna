@@ -80,8 +80,8 @@ namespace Server
             command_c2 = GetFloatFromString(textBox4.Text, out is_C2_FormatError);
             command_c3 = GetFloatFromString(textBox5.Text, out is_C3_FormatError);
             command_c4 = GetByteFromString(textBox6.Text, out is_C4_FormatError);
-            commandReserved = 0;
-            commandCounter = GetByteFromString(textBox7.Text, out is_C4_FormatError);
+            commandReserved = GetUshortFromString(textBox7.Text, out isReservedFormatError);
+            commandCounter = GetByteFromString(textBox8.Text, out isCounterFormatError);
         }
 
         static byte GetByteFromString(string hexString, out bool isFormatError)
@@ -97,7 +97,7 @@ namespace Server
             if (hexString.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
             {
                 hexString = hexString.Substring(2);
-            }
+            }           
 
             bool isSuccess = byte.TryParse(hexString,
                 NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo,
@@ -130,6 +130,8 @@ namespace Server
             {
                 hexString = hexString.Substring(2);
             }
+
+            hexString = hexString.Replace("_", "");
 
             bool isSuccess = ushort.TryParse(hexString, 
                 NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, 
@@ -258,6 +260,10 @@ namespace Server
             {
                 MessageBox.Show("Ошибка в написании \"C4\". C4 должен быть byte.");
             }
+            if (isReservedFormatError)
+            {
+                MessageBox.Show("Ошибка в написании \"Reserved\". Counter должен быть ushort.");
+            }
             if (isCounterFormatError)
             {
                 MessageBox.Show("Ошибка в написании \"Counter\". Counter должен быть byte.");
@@ -273,6 +279,7 @@ namespace Server
             Packet.CommandC2 = command_c2;
             Packet.CommandC3 = command_c3;
             Packet.CommandC4 = command_c4;
+            Packet.CommandReserved = commandReserved;
             Packet.CommandCounter = commandCounter;
         }                
 
@@ -284,19 +291,14 @@ namespace Server
                 for (int i = 0; i < 3; i++)
                 {
                     Packet.IsAnswerCommandReceived = false;
-                    byte[] commandBytes = Packet.GetCommandBytesFromProperties();
-
-                    //byte[] commandBytes1 = new byte[1024];
-                    //commandBytes.CopyTo(commandBytes1, 0);
+                    byte[] commandBytes = Packet.GetCommandBytesFromProperties();                    
 
                     ConversationUDP.SendRequestToClient(commandBytes);
 
                     if (Packet.IsAnswerCommandReceived)
                     {
                         break;
-                    }
-
-                    //Thread.Sleep(50);
+                    }                    
                 }
             });
         }
@@ -454,6 +456,14 @@ namespace Server
         {
             get { return is_C4_FormatError; }
             set { is_C4_FormatError = value; }
+        }
+
+        private bool isReservedFormatError;
+
+        public bool IsReservedFormatError
+        {
+            get { return isReservedFormatError; }
+            set { isReservedFormatError = value; }
         }
 
         private bool isCounterFormatError;

@@ -107,7 +107,7 @@ namespace Client
 
         private void UpdatePacket()
         {
-            //Packet.AnswerCommandHeader = answerCommandHeader;
+            Packet.AnswerCommandHeader = answerCommandHeader;
             Packet.AnswerCommandType = answerCommandType;
             Packet.AnswerCommand_f1 = answerCommand_f1;
             Packet.AnswerCommand_f2 = answerCommand_f2;
@@ -185,7 +185,7 @@ namespace Client
             answerCommand_f1 = GetFloatFromString(textBox12.Text, out isAnswerCommand_f1_FormatError);
             answerCommand_f2 = GetFloatFromString(textBox13.Text, out isAnswerCommand_f1_FormatError);
             answerCommand_f3 = GetFloatFromString(textBox14.Text, out isAnswerCommand_f2_FormatError);
-            //answerCommandChecksum = GetUshortFromString(textBox15.Text, out isAnswerCommandChecksumFormatError);            
+            // Контрольная сумма не должна обновляться с GUI. Она рассчитывается.
         }
 
         static byte GetByteFromString(string hexString, out bool isFormatError)
@@ -234,6 +234,8 @@ namespace Client
             {
                 hexString = hexString.Substring(2);
             }
+
+            hexString = hexString.Replace("_", "");
 
             bool isSuccess = ushort.TryParse(hexString,
                 NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo,

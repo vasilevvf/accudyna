@@ -8,18 +8,19 @@
         Title="Server" Height="281" Width="699" Loaded="Window_Loaded" Closed="Window_Closed">
     <Grid Background="#d2d2d2" Margin="0,0,0,-6">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="657*"/>
-            <ColumnDefinition Width="23*"/>
+            <ColumnDefinition Width="69*"/>
+            <ColumnDefinition Width="607*"/>
+            <ColumnDefinition Width="24*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel HorizontalAlignment="Left" Margin="0,21,0,0" Orientation="Vertical" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="218" Width="680">
+        <StackPanel HorizontalAlignment="Left" Margin="0,21,0,0" Orientation="Vertical" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="218" Width="680">
             <Border Height="119" BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
                 <Grid Width="678">
                     <StackPanel>
-                        <Label Content="Отправленная команда. byte, ushort, float. Прямой порядок байт" FontSize="14"/>
+                        <Label Content="Отправленная команда. byte, ushort, float. Прямой порядок байт." FontSize="14"/>
                         <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Header"/>
-                                <TextBox x:Name="textBox" TextWrapping="Wrap" Text="0x8585"/>
+                                <TextBox x:Name="textBox" TextWrapping="Wrap" Text="0x85_96"/>
                             </StackPanel>
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Axis ID"/>
@@ -47,7 +48,7 @@
                             </StackPanel>
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Reserved"/>
-                                <TextBox x:Name="textBox7" TextWrapping="Wrap" Text="0x08"/>
+                                <TextBox x:Name="textBox7" TextWrapping="Wrap" Text="0x00_08"/>
                             </StackPanel>
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Counter"/>
@@ -64,7 +65,7 @@
             </Border>
             <Border BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
                 <StackPanel>
-                    <Label Content="Ответ на команду. Hex. Обратный порядок байт" FontSize="14"/>
+                    <Label Content="Ответ на команду. Hex. Обратный порядок байт." FontSize="14"/>
                     <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                         <StackPanel Height="52" Width="61">
                             <Label Content="Header"/>

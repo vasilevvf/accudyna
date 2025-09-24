@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Client" Height="264" Width="699" Loaded="Window_Loaded" Closed="Window_Closed">
+        Title="Client. Accudina." Height="264" Width="699" Loaded="Window_Loaded" Closed="Window_Closed">
     <Grid Background="#d2d2d2" Margin="0,0,0,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -14,7 +14,7 @@
             <Border BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
                 <Grid>
                     <StackPanel>
-                        <Label Content="Принятая команда. Hex" FontSize="14"/>
+                        <Label Content="Принятая команда. Hex. Обратный порядок байт." FontSize="14"/>
                         <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Header"/>
@@ -62,12 +62,12 @@
             </Border>
             <Border BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" Height="131">
                 <StackPanel Margin="0,0,0,0">
-                    <Label Content="Ответ на команду" FontWeight="Normal" FontSize="14">
+                    <Label Content="Ответ на команду. byte, ushort, float. Прямой порядок байт." FontWeight="Normal" FontSize="14">
                     </Label>
                     <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                         <StackPanel Height="52" Width="61">
                             <Label Content="Header"/>
-                            <TextBox x:Name="textBox10" TextWrapping="Wrap" Text="0xAAAA"/>
+                            <TextBox x:Name="textBox10" TextWrapping="Wrap" Text="0xAA_BB"/>
                         </StackPanel>
                         <StackPanel Height="52" Width="61">
                             <Label Content="Type"/>

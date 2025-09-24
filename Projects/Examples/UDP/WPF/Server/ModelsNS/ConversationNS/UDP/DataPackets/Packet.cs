@@ -142,10 +142,10 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             byte[] valueBytes = BitConverter.GetBytes(val);
 
             // Инвертировать порядок байтов в массиве.
-            //Array.Reverse(valueBytes);
+            Array.Reverse(valueBytes);
 
             // Преобразовать байты в строку байтов.
-            string valueHexString = string.Format("x{0:X2}{1:X2}", valueBytes[0], valueBytes[1]);
+            string valueHexString = string.Format("0x{0:X2}_{1:X2}", valueBytes[0], valueBytes[1]);
             return valueHexString;
         }
 
@@ -540,7 +540,7 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             byte[] valueBytes = BitConverter.GetBytes(val);
 
             // Инвертировать порядок байтов в массиве.
-            Array.Reverse(valueBytes);
+            //Array.Reverse(valueBytes);
 
             // Преобразовать байты в строку байтов.
             string valueHexString = BitConverter.ToString(valueBytes);
