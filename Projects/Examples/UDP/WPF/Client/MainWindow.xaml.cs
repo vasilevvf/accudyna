@@ -1,26 +1,15 @@
 ﻿using Client.ModelsNS.ConversationNS.UDP_NS;
 using Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Client
 {
     /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
+    /// Эмулятор поворотного стола Accudina.
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -29,6 +18,11 @@ namespace Client
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        static MainWindow()
+        {
+            isNeedShowAnswerCommandFormatErrorMessage = false;
         }
 
         #endregion Конструктор.
@@ -72,37 +66,48 @@ namespace Client
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            CheckCommandInputErrors();
+            ShowAnswerCommandFormatErrorMessage();
             UpdatePacket();
             SendAnswerCommandTask();
         }
 
-        private void CheckCommandInputErrors()
+        private void ShowAnswerCommandFormatErrorMessage()
         {
+            if (!isNeedShowAnswerCommandFormatErrorMessage)
+            {
+                return;
+            }
+
             if (isAnswerCommandHeaderFormatError)
             {
+                isNeedShowAnswerCommandFormatErrorMessage = false;
                 MessageBox.Show("Ошибка в написании \"Header\". Header должен быть ushort.");
             }
             if (isAnswerCommandTypeFormatError)
             {
-                MessageBox.Show("Ошибка в написании \"Type\". Type должен быть byte.");
+                isNeedShowAnswerCommandFormatErrorMessage = false;                
+                MessageBox.Show("Ошибка в написании \"Type\". Type должен быть byte.");                
             }
             if (isAnswerCommand_f1_FormatError)
             {
+                isNeedShowAnswerCommandFormatErrorMessage = false;
                 MessageBox.Show("Ошибка в написании \"f1\". f1 должен быть float.");
             }
             if (isAnswerCommand_f2_FormatError)
             {
+                isNeedShowAnswerCommandFormatErrorMessage = false;
                 MessageBox.Show("Ошибка в написании \"f2\". f2 должен быть float.");
             }
             if (isAnswerCommand_f3_FormatError)
             {
+                isNeedShowAnswerCommandFormatErrorMessage = false;
                 MessageBox.Show("Ошибка в написании \"f3\". f3 должeн быть float.");
             }
             if (isAnswerCommandChecksumFormatError)
             {
+                isNeedShowAnswerCommandFormatErrorMessage = false;
                 MessageBox.Show("Ошибка в написании \"Checksum\". Checksum должна быть ushort.");
-            }
+            }            
         }
 
         private void UpdatePacket()
@@ -176,6 +181,8 @@ namespace Client
             UpdatePacketPropertiesFromGUI();
             UpdatePacketPropertiesOnGUI();
             UpdatePacket();
+            ShowAnswerCommandFormatErrorMessage();
+            CheckAswerCommandFormatError();
         }
 
         private void UpdatePacketPropertiesFromGUI()
@@ -190,10 +197,11 @@ namespace Client
 
         static byte GetByteFromString(string hexString, out bool isFormatError)
         {
-            isFormatError = false;
+            isFormatError = false;            
 
             if (hexString == string.Empty)
             {
+                isFormatError = true;                
                 return 0;
             }
 
@@ -209,11 +217,11 @@ namespace Client
 
             if (isSuccess)
             {
-                isFormatError = false;
+                isFormatError = false;                
                 return result;
             }
 
-            isFormatError = true;
+            isFormatError = true;            
             return 0;
         }
 
@@ -222,10 +230,11 @@ namespace Client
         /// </summary>        
         internal static ushort GetUshortFromString(string hexString, out bool isFormatError)
         {
-            isFormatError = false;
+            isFormatError = false;            
 
             if (hexString == string.Empty)
             {
+                isFormatError = true;                
                 return 0;
             }
 
@@ -243,11 +252,11 @@ namespace Client
 
             if (isSuccess)
             {
-                isFormatError = false;
+                isFormatError = false;                
                 return result;
             }
 
-            isFormatError = true;
+            isFormatError = true;            
             return 0;
         }
 
@@ -256,6 +265,8 @@ namespace Client
         /// </summary>
         internal static float GetFloatFromString(string str, out bool isFormatError)
         {
+            isFormatError = false;            
+
             // Заменяем и точку и запятую на текущее значение
             // десятичного разделителя.           
             string decimal_sep = NumberFormatInfo.CurrentInfo.CurrencyDecimalSeparator;
@@ -267,12 +278,12 @@ namespace Client
 
             if (parseOk)
             {
-                isFormatError = false;
+                isFormatError = false;                
                 return f;
             }
             else
             {
-                isFormatError = true;
+                isFormatError = true;                
                 return 0;
             }
         }
@@ -299,6 +310,25 @@ namespace Client
             textBox15.Text = Packet.AnswerCommandChecksumString;
 
             isNeedUpdateCommandOnGUI = false;
+        }
+
+        /// <summary>
+        /// Проверить наличие ошибок формата в AnswerCommand.
+        /// </summary>
+        private void CheckAswerCommandFormatError()
+        {
+            if (isAnswerCommandHeaderFormatError|
+                isAnswerCommandTypeFormatError|
+                isAnswerCommand_f1_FormatError|
+                isAnswerCommand_f2_FormatError|
+                isAnswerCommand_f3_FormatError)
+            {
+                isAnswerCommandFormatErrorPresent = true;
+            }
+            else
+            {
+                isAnswerCommandFormatErrorPresent = false;
+            }
         }
 
         #endregion Методы.
@@ -427,7 +457,21 @@ namespace Client
             set { isAnswerCommandReceived = value; }
         }
 
+        private static bool isAnswerCommandFormatErrorPresent;
 
+        public static bool IsAnswerCommandFormatErrorPresent
+        {
+            get { return isAnswerCommandFormatErrorPresent; }
+            set { isAnswerCommandFormatErrorPresent = value; }
+        }
+
+        private static bool isNeedShowAnswerCommandFormatErrorMessage;
+
+        public static bool IsNeedShowAnswerCommandFormatErrorMessage
+        {
+            get { return isNeedShowAnswerCommandFormatErrorMessage; }
+            set { isNeedShowAnswerCommandFormatErrorMessage = value; }
+        }
 
         #endregion AnswerCommand.        
 
@@ -435,6 +479,6 @@ namespace Client
 
         #endregion Главное окно.
 
-       
+
     }
 }

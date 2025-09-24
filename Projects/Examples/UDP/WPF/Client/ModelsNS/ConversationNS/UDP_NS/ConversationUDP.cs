@@ -1,12 +1,8 @@
 ﻿using Client.ModelsNS.ConversationNS.UDP_NS.DataPacketsNS;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Client.ModelsNS.ConversationNS.UDP_NS
 {
@@ -145,8 +141,13 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
                        
             if (readBytesCount > 0)
             {
-                Packet.SetCommandProperties(responseData);                
-                SendAnswerCommand();
+                Packet.SetCommandProperties(responseData);
+                MainWindow.IsNeedShowAnswerCommandFormatErrorMessage = true;
+                if (MainWindow.IsAnswerCommandFormatErrorPresent)
+                {
+                    return;
+                }
+                SendAnswerCommand();                
             }            
         }        
 
