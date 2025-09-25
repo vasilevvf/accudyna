@@ -1,23 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
 {
     internal class Packet
-    {
-        #region Конструктор.
-
-        static Packet()
-        {
-            commandHeader = 0x8585;
-            CommandChecksumString = "";
-        }
-
-        #endregion Конструктор.
+    {        
 
         #region Command.
 
@@ -124,17 +112,7 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         {
             string hexString = GetStringFromInt(commandChecksum);
             return hexString;
-        }        
-
-        static string GetStringFromInt(byte val)
-        {                   
-            // Получить массив байтов.
-            byte[] valueBytes = { val };
-           
-            // Преобразовать байты в строку байтов.
-            string valueHexString = BitConverter.ToString(valueBytes);
-            return valueHexString;
-        }
+        }                
 
         static string GetStringFromInt(ushort val)
         {          
@@ -147,20 +125,7 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
             // Преобразовать байты в строку байтов.
             string valueHexString = string.Format("0x{0:X2}_{1:X2}", valueBytes[0], valueBytes[1]);
             return valueHexString;
-        }
-
-        static string GetStringFromFloat(float floatValue)
-        {
-            // Получить массив байтов.
-            byte[] valueBytes = BitConverter.GetBytes(floatValue);
-
-            // Инвертировать порядок байтов в массиве.
-            //Array.Reverse(valueBytes);
-
-            // Преобразовать байты в строку байтов.
-            string valueHexString = BitConverter.ToString(valueBytes);
-            return valueHexString;
-        }
+        }        
 
         #endregion Методы свойств.
 
@@ -477,49 +442,37 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         #region Методы свойств.
 
         static string GetAnswerCommandHeaderString()
-        {
-            //string hex = string.Format("{0:X2}", answerCommandHeader);
-            //return hex;
+        {            
             string hexString = GetStringFromIntReverse(answerCommandHeader);
             return hexString;
         }
 
         static string GetAnswerCommandTypeString()
-        {
-            //string hex = string.Format("{0:X2}", answerCommandType);
-            //return hex;
+        {            
             string hexString = GetStringFromIntReverse(answerCommandType);
             return hexString;
         }
 
         static string GetAnswerCommand_f1_String()
-        {
-            //string hexString = GetStringFromFloat(answerCommand_f1);
-            //return hexString;
+        {            
             string hexString = GetStringFromFloatReverse(answerCommand_f1);
             return hexString;
         }
 
         static string GetAnswerCommand_f2_String()
-        {
-            //string hexString = GetStringFromFloat(answerCommand_f2);
-            //return hexString;
+        {            
             string hexString = GetStringFromFloatReverse(answerCommand_f2);
             return hexString;
         }
 
         static string GetAnswerCommand_f3_String()
-        {
-            //string hexString = GetStringFromFloat(answerCommand_f3);
-            //return hexString;
+        {            
             string hexString = GetStringFromFloatReverse(answerCommand_f3);
             return hexString;
         }
 
         static string GetAnswerCommandChecksumString()
-        {
-            //string hex = string.Format("{0:X2}", answerCommandChecksum);
-            //return hex;
+        {            
             string hexString = GetStringFromIntReverse(answerCommandChecksum);
             return hexString;
         }
@@ -537,10 +490,7 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         static string GetStringFromIntReverse(ushort val)
         {
             // Получить массив байтов.
-            byte[] valueBytes = BitConverter.GetBytes(val);
-
-            // Инвертировать порядок байтов в массиве.
-            //Array.Reverse(valueBytes);
+            byte[] valueBytes = BitConverter.GetBytes(val);            
 
             // Преобразовать байты в строку байтов.
             string valueHexString = BitConverter.ToString(valueBytes);
@@ -550,10 +500,7 @@ namespace Server.ModelsNS.ConversationNS.UDP.DataPackets
         static string GetStringFromFloatReverse(float floatValue)
         {
             // Получить массив байтов.
-            byte[] valueBytes = BitConverter.GetBytes(floatValue);
-
-            // Инвертировать порядок байтов в массиве.
-            //Array.Reverse(valueBytes);
+            byte[] valueBytes = BitConverter.GetBytes(floatValue);            
 
             // Преобразовать байты в строку байтов.
             string valueHexString = BitConverter.ToString(valueBytes);

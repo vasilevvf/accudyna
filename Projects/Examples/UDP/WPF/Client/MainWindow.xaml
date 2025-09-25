@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Client. Accudina." Height="264" Width="699" Loaded="Window_Loaded" Closed="Window_Closed">
+        Title="Client. Accudina." Height="245" Width="699" Loaded="Window_Loaded" Closed="Window_Closed">
     <Grid Background="#d2d2d2" Margin="0,0,0,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -60,14 +60,14 @@
                     </StackPanel>
                 </Grid>
             </Border>
-            <Border BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}" Height="131">
+            <Border BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
                 <StackPanel Margin="0,0,0,0">
                     <Label Content="Ответ на команду. byte, ushort, float. Прямой порядок байт." FontWeight="Normal" FontSize="14">
                     </Label>
                     <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                         <StackPanel Height="52" Width="61">
                             <Label Content="Header"/>
-                            <TextBox x:Name="textBox10" TextWrapping="Wrap" Text="0xAA_BB"/>
+                            <TextBox x:Name="textBox10" TextWrapping="Wrap" Text="0xAA_AA"/>
                         </StackPanel>
                         <StackPanel Height="52" Width="61">
                             <Label Content="Type"/>
@@ -91,7 +91,6 @@
                         </StackPanel>
 
                     </StackPanel>
-                    <Button Content="Отправить" Click="Button_Click" Height="26" Width="652" HorizontalAlignment="Left" IsEnabled="False"/>
                 </StackPanel>
 
             </Border>

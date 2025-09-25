@@ -7,17 +7,7 @@ using System.Threading;
 namespace Client.ModelsNS.ConversationNS.UDP_NS
 {
     abstract class ConversationUDP
-    {
-        #region Статический конструктор.
-
-        static ConversationUDP()
-        {
-            //OpenConnection();
-            //LaunchTimerServerMessage();
-        }
-
-        #endregion Статический конструктор.
-
+    {       
         #region Таймер опроса контроллера.
 
         #region Свойства.
@@ -30,8 +20,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             set { continuousQueryCount = value; }
         }
 
-        static Socket socket;
-        static ushort arraySize; // Размер принятого массива.
+        static Socket socket;        
         static IPAddress localAddress;
 
         // Буфер для получения данных.
@@ -69,21 +58,22 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         }
 
         static void OpenConnection()
-        {
-            //responseData = new byte[64];
+        {            
             localAddress = IPAddress.Parse("127.0.0.1");
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
-            socket.ReceiveTimeout = 30;
+            socket.ReceiveTimeout = receiveTimeout;
 
             // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
             socket.Bind(new IPEndPoint(localAddress, receivePort));
         }
 
         static Timer timerServerMessage;                   // Таймер сообщений сервера.
-        const int periodTimerServerMessage = 60;          // Период таймера сообщений сервера.                                                        
-        static TimerCallback timerServerMessageCallback;   // Делегат для типа Timer.        
-
+        static TimerCallback timerServerMessageCallback;   // Делегат для типа Timer. 
+        
+        const int periodTimerServerMessage = 20;           // Период таймера сообщений сервера.
+        const int receiveTimeout = 10;                     // Время ожидания для синхронной socket.Receive().
+               
         // Функция обратного вызова для таймера сообщений сервера.
         static void TimerServerMessageCallback(object state)
         {                    
@@ -92,11 +82,9 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         
         /// Запрос в контроллер.     
         static private void ReadWriteBuffer()
-        {
-           
+        {           
             // Буфер для получения данных.
-            byte[] responseData = new byte[64];
-            ArraySegment<byte> responseDataSegment = new ArraySegment<byte>(responseData);
+            byte[] responseData = new byte[64];            
 
             /// Получаю данные из потока.
             /// ReceiveFromAsync() означает неблокирующую поток функцию. Аналог
@@ -141,13 +129,9 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
                        
             if (readBytesCount > 0)
             {
-                Packet.SetCommandProperties(responseData);
+                Packet.SetCommandProperties(responseData);                
+                SendAnswerCommand();
                 MainWindow.IsNeedShowAnswerCommandFormatErrorMessage = true;
-                if (MainWindow.IsAnswerCommandFormatErrorPresent)
-                {
-                    return;
-                }
-                SendAnswerCommand();                
             }            
         }        
 
@@ -170,7 +154,6 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             {
                 timerServerMessage.Dispose();
             }
-
         }
 
         internal static void CloseConnection()

@@ -9,7 +9,10 @@ using System.Windows;
 namespace Server
 {
     /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
+    /// Сервер посылает запрос клиенту. 
+    /// Клиент это поворотный стол Accudina.
+    /// Клиент постоянно ожидает запросы от сервера.
+    /// Даёт ответ на запрос, как только он приходит.
     /// </summary>
     public partial class MainWindow : Window
     {

@@ -8,11 +8,10 @@
         Title="Server" Height="281" Width="699" Loaded="Window_Loaded" Closed="Window_Closed">
     <Grid Background="#d2d2d2" Margin="0,0,0,-6">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="69*"/>
-            <ColumnDefinition Width="607*"/>
-            <ColumnDefinition Width="24*"/>
+            <ColumnDefinition Width="225*"/>
+            <ColumnDefinition Width="8*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel HorizontalAlignment="Left" Margin="0,21,0,0" Orientation="Vertical" VerticalAlignment="Top" Grid.ColumnSpan="3" Height="218" Width="680">
+        <StackPanel HorizontalAlignment="Left" Margin="0,21,0,0" Orientation="Vertical" VerticalAlignment="Top" Grid.ColumnSpan="2" Height="218" Width="680">
             <Border Height="119" BorderThickness="2,2,2,2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveCaptionBrushKey}}">
                 <Grid Width="678">
                     <StackPanel>
@@ -20,7 +19,7 @@
                         <StackPanel Height="55" Width="664" Orientation="Horizontal" HorizontalAlignment="Left">
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Header"/>
-                                <TextBox x:Name="textBox" TextWrapping="Wrap" Text="0x85_96"/>
+                                <TextBox x:Name="textBox" TextWrapping="Wrap" Text="0x85_85"/>
                             </StackPanel>
                             <StackPanel Height="52" Width="61">
                                 <Label Content="Axis ID"/>

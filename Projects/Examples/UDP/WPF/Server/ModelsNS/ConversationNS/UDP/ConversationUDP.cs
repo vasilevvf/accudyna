@@ -5,12 +5,7 @@ using System.Net.Sockets;
 namespace Server.ModelsNS.ConversationNS.UDP
 {
     abstract class ConversationUDP
-    {
-
-        static ConversationUDP()
-        {
-            
-        }
+    {        
 
         #region Свойства.
 
@@ -22,8 +17,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
         internal const int waitingTime = 10;
 
         static IPAddress localAddress;
-        static Socket socket;
-        static int arraySize;
+        static Socket socket;     
 
         /// <summary>
         /// 
@@ -55,7 +49,6 @@ namespace Server.ModelsNS.ConversationNS.UDP
         internal static void SendRequestToClient(byte[] bytes)
         {            
             WriteBuffer(bytes);            
-
             ReadBuffer();
         }
 
@@ -68,9 +61,8 @@ namespace Server.ModelsNS.ConversationNS.UDP
         static void ReadBuffer()
         {
             // Буфер для получения данных.
-            byte[] responseData = new byte[1024];            
-            int readBytesCount = 0;
-
+            byte[] responseData = new byte[1024];
+            int readBytesCount;
             try
             {
                 /// ReceiveFromAsync() означает неблокирующую поток функцию. Аналог
@@ -108,28 +100,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
             socket.Close();
         }
 
-        #endregion Методы.
-
-        #region Вспомогательные методы.
-
-        private static string GetPacketString(byte[] bytes, int arraySize)
-        {
-            string s;
-            string bytesString = "";
-
-            bytesString = string.Format("{0:X2}", bytes[0]);
-            for (int i = 1; i < arraySize; i++)
-            {
-                s = string.Format("-{0:X2}", bytes[i]);
-                bytesString = string.Concat(bytesString, s);
-            }
-
-            return bytesString;
-        }
-
-        
-        
-        #endregion Вспомогательные методы.        
+        #endregion Методы.        
 
     }
 }

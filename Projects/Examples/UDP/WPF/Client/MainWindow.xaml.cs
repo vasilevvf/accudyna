@@ -10,7 +10,11 @@ namespace Client
 {
     /// <summary>
     /// Эмулятор поворотного стола Accudina.
-    /// </summary>
+    /// Сервер посылает запрос клиенту. 
+    /// Клиент это поворотный стол Accudina.
+    /// Клиент постоянно ожидает запросы от сервера.
+    /// Даёт ответ на запрос, как только он приходит.
+    /// </summary>  
     public partial class MainWindow : Window
     {
         #region Конструктор.
@@ -42,10 +46,7 @@ namespace Client
             #endregion Таймер обновления GUI.
 
             ConversationUDP.LaunchTimerServerMessage();
-
-            #region Таймер сообщений сервера.
-
-            #endregion Таймер сообщений сервера.
+            
         }
 
         #endregion Загрузка окна.
@@ -59,17 +60,9 @@ namespace Client
 
         #endregion Закрытие окна.
 
-
         #region Кнопки.
 
-        #region Отправить.
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            ShowAnswerCommandFormatErrorMessage();
-            UpdatePacket();
-            SendAnswerCommandTask();
-        }
+        #region Отправить.      
 
         private void ShowAnswerCommandFormatErrorMessage()
         {
@@ -190,15 +183,13 @@ namespace Client
             answerCommandHeader = GetUshortFromString(textBox10.Text, out isAnswerCommandHeaderFormatError);
             answerCommandType = GetByteFromString(textBox11.Text, out isAnswerCommandTypeFormatError);
             answerCommand_f1 = GetFloatFromString(textBox12.Text, out isAnswerCommand_f1_FormatError);
-            answerCommand_f2 = GetFloatFromString(textBox13.Text, out isAnswerCommand_f1_FormatError);
-            answerCommand_f3 = GetFloatFromString(textBox14.Text, out isAnswerCommand_f2_FormatError);
+            answerCommand_f2 = GetFloatFromString(textBox13.Text, out isAnswerCommand_f2_FormatError);
+            answerCommand_f3 = GetFloatFromString(textBox14.Text, out isAnswerCommand_f3_FormatError);
             // Контрольная сумма не должна обновляться с GUI. Она рассчитывается.
         }
 
         static byte GetByteFromString(string hexString, out bool isFormatError)
         {
-            isFormatError = false;            
-
             if (hexString == string.Empty)
             {
                 isFormatError = true;                
@@ -230,8 +221,6 @@ namespace Client
         /// </summary>        
         internal static ushort GetUshortFromString(string hexString, out bool isFormatError)
         {
-            isFormatError = false;            
-
             if (hexString == string.Empty)
             {
                 isFormatError = true;                
@@ -265,7 +254,6 @@ namespace Client
         /// </summary>
         internal static float GetFloatFromString(string str, out bool isFormatError)
         {
-            isFormatError = false;            
 
             // Заменяем и точку и запятую на текущее значение
             // десятичного разделителя.           
@@ -389,9 +377,7 @@ namespace Client
         {
             get { return answerCommand_f1; }
             set { answerCommand_f1 = value; }
-        }
-
-        private static string answerCommand_f1_String;        
+        }        
 
         private bool isAnswerCommand_f1_FormatError;
 
@@ -478,7 +464,6 @@ namespace Client
         #endregion Свойства.
 
         #endregion Главное окно.
-
 
     }
 }
