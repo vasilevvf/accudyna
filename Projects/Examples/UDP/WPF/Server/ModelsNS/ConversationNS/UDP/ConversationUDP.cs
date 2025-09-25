@@ -40,7 +40,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
         {
             localAddress = IPAddress.Parse("127.0.0.1");
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            socket.ReceiveTimeout = 60;
+            socket.ReceiveTimeout = 30;
 
             // Запускаю получение сообщений по адресу 127.0.0.1:localPort.
             socket.Bind(new IPEndPoint(localAddress, receivePort));
@@ -61,7 +61,7 @@ namespace Server.ModelsNS.ConversationNS.UDP
         static void ReadBuffer()
         {
             // Буфер для получения данных.
-            byte[] responseData = new byte[1024];
+            byte[] responseData = new byte[128];
             int readBytesCount;
             try
             {
@@ -91,9 +91,35 @@ namespace Server.ModelsNS.ConversationNS.UDP
             /// синхронной.             
             if (readBytesCount > 0)
             {
-                Packet.SetAnswerCommandProperties(responseData);                
-            }                        
-        }       
+                Packet.SetAnswerCommandProperties(responseData);
+                /// Можно чистить буфер. Но это потребует дополнительной
+                /// задержки socket.ReceiveTimeout. Можно не чистить
+                /// буфер, если задать большой объём.
+                /// Например 1024 байта.
+                //ClearBuffer();
+            }
+        }
+
+        /// <summary>
+        /// Очистить буфер чтения.
+        /// </summary>
+        private static void ClearBuffer()
+        {
+            // Буфер для получения данных.
+            byte[] responseData = new byte[128];
+            int readBytesCount = 0;
+            do
+            {
+                try
+                {
+                    readBytesCount = socket.Receive(responseData, SocketFlags.None);
+                }
+                catch (SocketException)
+                {
+                    /// Закончилось время ожидания для Receive().
+                }
+            } while (readBytesCount > 0);
+        }
 
         internal static void CloseConnection()
         {

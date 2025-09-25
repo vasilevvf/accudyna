@@ -84,7 +84,7 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
         static private void ReadWriteBuffer()
         {           
             // Буфер для получения данных.
-            byte[] responseData = new byte[64];            
+            byte[] responseData = new byte[128];            
 
             /// Получаю данные из потока.
             /// ReceiveFromAsync() означает неблокирующую поток функцию. Аналог
@@ -131,14 +131,13 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             {
                 Packet.SetCommandProperties(responseData);                
                 SendAnswerCommand();
+                /// Можно чистить буфер. Но это потребует дополнительной
+                /// задержки socket.ReceiveTimeout. Можно не чистить
+                /// буфер, если задать большой объём.
+                /// Например 1024 байта.
+                //ClearBuffer();
                 MainWindow.IsNeedShowAnswerCommandFormatErrorMessage = true;
             }            
-        }        
-
-        internal static void WriteBuffer(byte[] bytes)
-        {
-            // Отправляю данные.            
-            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));            
         }
 
         private static void SendAnswerCommand()
@@ -147,6 +146,33 @@ namespace Client.ModelsNS.ConversationNS.UDP_NS
             WriteBuffer(answerCommandBytes);
         }
 
+        /// <summary>
+        /// Очистить буфер чтения.
+        /// </summary>
+        private static void ClearBuffer()
+        {
+            // Буфер для получения данных.
+            byte[] responseData = new byte[128];
+            int readBytesCount = 0;
+            do
+            {
+                try
+                {
+                    readBytesCount = socket.Receive(responseData, SocketFlags.None);
+                }
+                catch (SocketException)
+                {
+                    /// Закончилось время ожидания для Receive().
+                }
+            } while (readBytesCount > 0);
+        }
+
+        internal static void WriteBuffer(byte[] bytes)
+        {
+            // Отправляю данные.            
+            socket.SendTo(bytes, SocketFlags.None, new IPEndPoint(localAddress, sendPort));            
+        }
+        
         internal static void StopTimerServerMessage()
         {
             // Остановить таймер опроса контроллера.
